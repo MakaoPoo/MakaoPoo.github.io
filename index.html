@@ -1,0 +1,272 @@
+<!DOCKTYPE html>
+
+<html lang="ja">
+<head>
+  <title>真姫ちゃんクソゲーかきくけこ</title>
+  <link rel="shortcut icon" href="maki_chan/favicon.ico">
+  <meta charset="utf-8" content="width=device-width, user-scale=yes, initial-scale=1.0, maximum-scale=1.0">
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/service-worker.js') // ここはservice-worker.jsのパスを指定
+      .then(function() { console.log('Service Worker Registered'); });
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyC8q4tP54cXzlMUDUwTC6AByfEJ1I0Lcp4",
+      authDomain: "makikuso-114514.firebaseapp.com",
+      databaseURL: "https://makikuso-114514.firebaseio.com",
+      projectId: "makikuso-114514",
+      storageBucket: "makikuso-114514.appspot.com",
+      messagingSenderId: "895019646284"
+    };
+    firebase.initializeApp(config);
+  </script>
+</head>
+
+<body>
+  <div class="screen">
+  <image class="back" src="maki_chan/back.png">
+  <image class="brow" id="brow1" src=  "maki_chan/brow1.png">
+  <image class="brow" id="brow2" src=  "maki_chan/brow2.png">
+  <image class="brow" id="brow3" src=  "maki_chan/brow3.png">
+  <image class="brow" id="brow4" src=  "maki_chan/brow4.png">
+  <image class="eye" id="eye1" src=    "maki_chan/eye1.png">
+  <image class="eye" id="eye2" src=    "maki_chan/eye2.png">
+  <image class="eye" id="eye3" src=    "maki_chan/eye3.png">
+  <image class="eye" id="eye4" src=    "maki_chan/eye4.png">
+  <image class="mouth" id="mouth1" src="maki_chan/mouth1.png">
+  <image class="mouth" id="mouth2" src="maki_chan/mouth2.png">
+  <image class="mouth" id="mouth3" src="maki_chan/mouth3.png">
+  <image class="mouth" id="mouth4" src="maki_chan/mouth4.png">
+  <image class="hair" src="maki_chan/hair.png">
+  </div>
+  <p>　真姫ちゃんかわいい</p>
+
+  <script>
+  var width = 640;
+  var height = 480;
+  var scale = 1;
+  var startFrame = -1;
+  var brow = 0, eye = 0, mouth = 0;
+  var gamePart = 0;
+  var count = 0;
+  var touch = false;
+  var vee1 = new Array(3);
+  var vee2 = new Audio("maki_chan/VEE2.wav");
+  var bgm = new Audio("maki_chan/BGM.mp3");
+  var veeCount = 0;
+
+  function main(){
+    var day = new Date();
+    var lastFrame = day.getTime();
+    var frame = (lastFrame-startFrame);
+    if(frame < 0 || startFrame == -1) frame =0;
+    startFrame = lastFrame;
+    guruguru(frame);
+
+    if(gamePart == 4) {
+      bgm.play();
+      if(bgm.currentTime > 20) {
+        gamePart = 5;
+        $('img').css('visibility', 'hidden');
+
+      }
+      scale += frame/10000;
+    }
+    if(gamePart < 5) {
+      draw();
+      setTimeout(main, 0);
+    }
+    else {
+      $('p').css('visibility', 'visible');
+    }
+  }
+
+  function draw() {
+    if(height / width < 0.75) {
+      $('.screen').css('height', height);
+      $('.screen').css('width', height/0.75);
+    } else {
+      $('.screen').css('width', width);
+      $('.screen').css('height', width*0.75);
+    }
+    $('.screen').css('width', $('.screen').width()*scale);
+    $('.screen').css('height', $('.screen').height()*scale);
+    $('.screen').css('margin-left', (width - $('.screen').width()) /2 + 'px');
+    $('.screen').css('margin-top', (height - $('.screen').height()) /2 + 'px');
+    imgScale = $('.screen').width() / 640;
+    $("img").each(function() {
+      $(this).css('width', $(this).data('width')*imgScale);
+    });
+    $('.brow').css('margin-left', 180*imgScale+'px');
+    $('.brow').css('margin-top', 150*imgScale+'px');
+    $('.eye').css('margin-left', 180*imgScale+'px');
+    $('.eye').css('margin-top', 190*imgScale+'px');
+    $('.mouth').css('margin-left', 270*imgScale+'px');
+    $('.mouth').css('margin-top', 310*imgScale+'px');
+  }
+
+  function drawFace(id, num) {
+    $('.'+id).css('visibility', 'hidden');
+    $('#'+id+num).css('visibility', 'visible');
+  }
+
+  function guruguru(frame) {
+    var speed = 150/frame;
+    count++;
+    switch(gamePart) {
+    case 1:
+      if(count > speed) count = 0;
+      if (count == 0) {
+        brow = (brow + 1) % 4;
+        drawFace('brow' ,brow + 1);
+        veeCount = (veeCount+1)%3;
+        vee1[veeCount].currentTime = 0;
+        vee1[veeCount].play();
+      }
+      break;
+    case 2:
+      if(count > speed/2) count = 0;
+      if (count == 0) {
+        mouth = (mouth + 1) % 4;
+        drawFace('mouth' ,mouth + 1);
+        if(vee2.currentTime>0.58) {
+          veeCount = (veeCount+1)%3;
+          vee1[veeCount].currentTime = 0;
+          vee1[veeCount].play();
+        }
+      }
+      break;
+    case 3:
+      if(count > speed/4) count = 0;
+      if (count == 0) {
+        eye = (eye + 1) % 4;
+        drawFace('eye' ,eye + 1);
+        if(vee2.currentTime>0.58) {
+          veeCount = (veeCount+1)%3;
+          vee1[veeCount].currentTime = 0;
+          vee1[veeCount].play();
+        }
+      }
+      break;
+    }
+    if(touch) {
+      if(gamePart < 4) {
+        if(gamePart > 0) {
+          for(var i = 0; i<3; i++) {
+            vee1[i].pause();
+          }
+          vee2.currentTime = 0;
+          vee2.play();
+        }
+        gamePart++;
+        count = -1;
+      }
+      touch = false;
+    }
+  }
+
+  $(window).resize(function() {
+    width = $('body').width();
+    height = $('body').height();
+  })
+  $(window).on('load', function(){
+    for(var i = 0; i<3; i++) {
+      vee1[i] = new Audio("maki_chan/VEE1.wav");
+      vee1[i].volume = 0.5;
+    }
+    vee2.volume = 0.5;
+    bgm.volume = 0.7;
+
+    $('.screen').on('mousedown', function() {
+      if(gamePart == 0) {
+        start();
+      }
+      touch = true;
+    });
+    $('.screen').on('touchstart', function() {
+      $('.screen').off('mousedown');
+      if(gamePart == 0) {
+        start();
+      }
+      touch = true;
+    });
+    $('.screen').on('thouchend', function() {
+      $('.screen').on('mousedown', function() {
+        touch = true;
+      });
+    });
+    width = $('body').width();
+    height = $('body').height();
+    $("img").each(function() {
+      $(this).attr('data-width', $(this).width());
+    });
+    draw();
+
+    $('p').css('margin-left', $('.screen').css('margin-left'));
+    $('p').css('margin-top', (height - $('p').height()) /1.6 + 'px');
+
+    $('.back').css('visibility', 'visible');
+    $('.hair').css('visibility', 'visible');
+    var browR = getRand(4, 1);
+    $('#brow'+browR).css('visibility', 'visible');
+    var eyeR = getRand(4, 1);
+    $('#eye'+eyeR).css('visibility', 'visible');
+    var mouthR = getRand(4, 1);
+    $('#mouth'+mouthR).css('visibility', 'visible');
+  });
+
+  function start(){
+    for(var i = 0; i<3; i++) {
+      vee1[i].load();
+    }
+    vee2.load();
+    bgm.load();
+    $('.eye').css('visibility', 'hidden');
+    $('.mouth').css('visibility', 'hidden');
+    main();
+  }
+
+  function getRand(max, min){
+    var rand = Math.floor( Math.random() * (max + 1 - min) ) + min ;
+    return rand;
+  }
+
+  </script>
+
+  <style>
+  html {
+  user-select: none;
+  }
+  body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0px;
+    background: #000;
+  }
+  img {
+    position: absolute;
+    visibility: hidden;
+  }
+  p {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #fff;
+    vertical-align: middle;
+    font-size: 8vmin;
+  }
+  </style>
+</body>
+</html>
