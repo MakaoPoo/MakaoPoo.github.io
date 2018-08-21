@@ -42,12 +42,11 @@
 
 <body>
   <canvas id="canvas"></canvas>
-  <AUDIO ID="vee1-1" SRC="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO ID="vee1-2" SRC="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO ID="vee1-3" SRC="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO ID="vee1-4" SRC="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO ID="vee2" SRC="maki_chan/VEE2.wav"></AUDIO>
-  <AUDIO ID="bgm" SRC="maki_chan/BGM.mp3"></AUDIO>
+  <AUDIO id="vee1-1" src="maki_chan/VEE1.wav"></AUDIO>
+  <AUDIO id="vee1-2" src="maki_chan/VEE1.wav"></AUDIO>
+  <AUDIO id="vee1-3" src="maki_chan/VEE1.wav"></AUDIO>
+  <AUDIO id="vee2" src="maki_chan/VEE2.wav"></AUDIO>
+  <AUDIO id="bgm" src="maki_chan/BGM.mp3"></AUDIO>
 
   <script>
   var width = 640;
@@ -219,6 +218,13 @@
     draw();
   });
   function start(){
+    document.getElementById('vee1-1').load();
+    document.getElementById('vee1-2').load();
+    document.getElementById('vee1-3').load();
+    document.getElementById('vee1-4').load();
+    document.getElementById('vee2').load();
+    document.getElementById('bgm').load();
+
     brow = 0;
     eye = -1;
     mouth = -1;
