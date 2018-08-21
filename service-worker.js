@@ -1,4 +1,3 @@
-# service-worker.js
 self.addEventListener('install', function(e) {
   console.log('[ServiceWorker] Install');
 });

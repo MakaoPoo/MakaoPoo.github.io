@@ -4,6 +4,7 @@
 <head>
   <title>真姫ちゃんクソゲーかきくけこ</title>
   <link rel="shortcut icon" href="maki_chan/favicon.ico">
+  <link rel="manifest" href="/manifest.json">
   <meta charset="utf-8" content="width=device-width, user-scale=yes, initial-scale=1.0, maximum-scale=1.0">
   <script
   src="https://code.jquery.com/jquery-3.3.1.js"
@@ -11,23 +12,14 @@
   crossorigin="anonymous"></script>
   <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-      .register('/service-worker.js') // ここはservice-worker.jsのパスを指定
-      .then(function() { console.log('Service Worker Registered'); });
-    }
-  </script>
-  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
-  <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyC8q4tP54cXzlMUDUwTC6AByfEJ1I0Lcp4",
-      authDomain: "makikuso-114514.firebaseapp.com",
-      databaseURL: "https://makikuso-114514.firebaseio.com",
-      projectId: "makikuso-114514",
-      storageBucket: "makikuso-114514.appspot.com",
-      messagingSenderId: "895019646284"
-    };
-    firebase.initializeApp(config);
+    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+      // 登録成功
+      console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    }).catch(function(err) {
+      // 登録失敗 :(
+      console.log('ServiceWorker registration failed: ', err);
+    });
+  }
   </script>
 </head>
 
@@ -63,7 +55,6 @@
   var vee2 = new Audio("maki_chan/VEE2.wav");
   var bgm = new Audio("maki_chan/BGM.mp3");
   var veeCount = 0;
-
   function main(){
     var day = new Date();
     var lastFrame = day.getTime();
@@ -71,13 +62,11 @@
     if(frame < 0 || startFrame == -1) frame =0;
     startFrame = lastFrame;
     guruguru(frame);
-
     if(gamePart == 4) {
       bgm.play();
       if(bgm.currentTime > 20) {
         gamePart = 5;
         $('img').css('visibility', 'hidden');
-
       }
       scale += frame/10000;
     }
@@ -89,7 +78,6 @@
       $('p').css('visibility', 'visible');
     }
   }
-
   function draw() {
     if(height / width < 0.75) {
       $('.screen').css('height', height);
@@ -113,12 +101,10 @@
     $('.mouth').css('margin-left', 270*imgScale+'px');
     $('.mouth').css('margin-top', 310*imgScale+'px');
   }
-
   function drawFace(id, num) {
     $('.'+id).css('visibility', 'hidden');
     $('#'+id+num).css('visibility', 'visible');
   }
-
   function guruguru(frame) {
     var speed = 150/frame;
     count++;
@@ -173,7 +159,6 @@
       touch = false;
     }
   }
-
   $(window).resize(function() {
     width = $('body').width();
     height = $('body').height();
@@ -185,7 +170,6 @@
     }
     vee2.volume = 0.5;
     bgm.volume = 0.7;
-
     $('.screen').on('mousedown', function() {
       if(gamePart == 0) {
         start();
@@ -210,10 +194,8 @@
       $(this).attr('data-width', $(this).width());
     });
     draw();
-
     $('p').css('margin-left', $('.screen').css('margin-left'));
     $('p').css('margin-top', (height - $('p').height()) /1.6 + 'px');
-
     $('.back').css('visibility', 'visible');
     $('.hair').css('visibility', 'visible');
     var browR = getRand(4, 1);
@@ -223,7 +205,6 @@
     var mouthR = getRand(4, 1);
     $('#mouth'+mouthR).css('visibility', 'visible');
   });
-
   function start(){
     for(var i = 0; i<3; i++) {
       vee1[i].load();
@@ -234,12 +215,10 @@
     $('.mouth').css('visibility', 'hidden');
     main();
   }
-
   function getRand(max, min){
     var rand = Math.floor( Math.random() * (max + 1 - min) ) + min ;
     return rand;
   }
-
   </script>
 
   <style>

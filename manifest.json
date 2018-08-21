@@ -1,28 +1,27 @@
-# manifest.json
 {
-  "name": "App Name",
-  "short_name": "short name",
+  "name": "MakiChan-Kusoge",
+  "short_name": "MakiKuso",
   "icons": [{
-      "src": "images/ico/apple-touch-icon.png",
+      "src": "images/ico/icon-512x512.png",
       "sizes": "128x128",
       "type": "image/png"
     }, {
-      "src": "images/ico/apple-touch-icon.png",
+      "src": "images/ico/icon-512x512.png",
       "sizes": "144x144",
       "type": "image/png"
     }, {
-      "src": "images/ico/apple-touch-icon.png",
+      "src": "images/ico/icon-512x512.png",
       "sizes": "152x152",
       "type": "image/png"
     }, {
-      "src": "images/ico/apple-touch-icon.png",
+      "src": "images/ico/icon-512x512.png",
       "sizes": "192x192",
       "type": "image/png"
     }, {
-      "src": "images/ico/apple-touch-icon.png",
+      "src": "images/ico/icon-512x512.png",
       "sizes": "256x256",
       "type": "image/png"
     }],
   "start_url": "/index.html",
-  "display": "standalone",
+  "display": "standalone"
 }
