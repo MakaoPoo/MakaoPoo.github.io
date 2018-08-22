@@ -44,6 +44,10 @@
 
   <script>
   var context = null;
+  var sig = null;
+  var gain = null;
+  var comp = null;
+  var ana  = null;
   var soundBuffList = {};
   var soundList = {
     vee1: "maki_chan/VEE1.wav",
@@ -59,6 +63,9 @@
   var count = 0;
   var touch = false;
   var playingVee1 = [];
+  var startTime = 0;
+  var prevSoundTime = 0;
+  var notFirstSound = false;
 
   function main(){
     var day = new Date();
@@ -68,7 +75,7 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
-      if(1 > 20) {
+      if(getCurrentTime() > 20) {
         gamePart = 5;
         scale  = 1;
       }
@@ -131,8 +138,12 @@
       if (count == 0) {
         brow = (brow + 1) % 4;
         if(!touch) {
-          playAudio("vee1");
-          // playSound("vee1");
+          var span = getCurrentTime() - prevSoundTime;
+          if(notFirstSound){
+            playSound("vee1", span*4);
+          }
+          notFirstSound = true;
+          prevSoundTime = getCurrentTime();
         }
       }
       break;
@@ -140,34 +151,39 @@
       if(count > speed/2) count = 0;
       if (count == 0) {
         mouth = (mouth + 1) % 4;
-        // if(getCurrentTime("vee2") > 0.58 && !touch) {
-          playAudio("vee1");
-        //   // playSound("vee1");
-        // }
+        if(getCurrentTime() > 0.58 && !touch) {
+          var span = getCurrentTime() - prevSoundTime;
+          if(notFirstSound){
+            playSound("vee1", span*2.2);
+          }
+          notFirstSound = true;
+          prevSoundTime = getCurrentTime();
+        }
       }
       break;
     case 3:
       if(count > speed/4) count = 0;
       if (count == 0) {
         eye = (eye + 1) % 4;
-        // if(getCurrentTime("vee2") > 0.58 && !touch) {
-          playAudio("vee1");
-        //   // playSound("vee1");
-        // }
+        if(getCurrentTime()> 0.58 && !touch) {
+          var span = getCurrentTime() - prevSoundTime;
+          if(notFirstSound){
+            playSound("vee1", span*3);
+          }
+          notFirstSound = true;
+          prevSoundTime = getCurrentTime();
+        }
       }
       break;
     }
     if(touch) {
       if(gamePart < 4) {
         if(gamePart > 0) {
-          // pauseAllVee1();
-            playAudio("vee2");
-          // playSound("vee2");
-
+          playSound("vee2");
           if(gamePart == 3) {
-            playAudio("bgm");
-            // playSound("bgm");
+            playSound("bgm");
           }
+          notFirstSound = false;
         }
         gamePart++;
         count = -1;
@@ -218,7 +234,6 @@
     loadSound("vee2");
     loadSound("bgm");
 
-
     brow = 0;
     eye = -1;
     mouth = -1;
@@ -231,36 +246,48 @@
       context = new AudioContext();
     }
     catch(e) {
-        context = null;
-        alert("このブラウザではWeb Audio APIがサポートされていません。");
+      context = null;
+      alert("このブラウザではWeb Audio APIがサポートされていません。");
     }
   }
 
   function loadSound(name){
-        if (!context) { return; }
-        var request = new XMLHttpRequest();
-        var url = soundList[name];
-        request.open('GET', url, true);
-        request.responseType = 'arraybuffer';
-        request.onload = function() {
-            context.decodeAudioData(
-                request.response,
-                function(buffer) {
-                    soundBuffList[name] = buffer;
-                },
-                function() {
-                    alert("音声ファイルの読み込みに失敗しました。");
-                });
-        }
-        request.send();
+    if (!context) { return; }
+    var request = new XMLHttpRequest();
+    var url = soundList[name];
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    request.onload = function() {
+      context.decodeAudioData(
+        request.response,
+        function(buffer) {
+          soundBuffList[name] = buffer;
+        },
+        function() {
+          alert("音声ファイルの読み込みに失敗しました。");
+        });
+    }
+    request.send();
+  }
+
+  function playSound(name, time=-1){
+    if (!soundBuffList) { return; }
+    var source = context.createBufferSource();
+    source.buffer = soundBuffList[name];
+    source.connect(context.destination);
+    if(time > 0) {
+      source.start(0,0,time);
+    } else {
+      source.start(0);
     }
 
-  function playAudio(name){
-      if (!soundBuffList) { return; }
-      var source = context.createBufferSource();
-      source.buffer = soundBuffList[name];
-      source.connect(context.destination);
-      source.start(0);
+    if(name == "vee2" || name == "bgm") {
+      startTime = context.currentTime
+    }
+  }
+
+  function getCurrentTime() {
+    return context.currentTime - startTime;
   }
 
   function getRand(max, min){
@@ -280,21 +307,6 @@
     overflow: hidden;
     margin: 0px;
     background: #000;
-  }
-  #canvas {
-  }
-  img {
-    position: absolute;
-    visibility: hidden;
-  }
-  p {
-    visibility: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: #fff;
-    vertical-align: middle;
-    font-size: 8vmin;
   }
   </style>
 </body>
