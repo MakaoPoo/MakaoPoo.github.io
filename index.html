@@ -71,7 +71,7 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
-      if(!notFirstSound) {
+      if(!notFirstSound && soundBuffList["bgm"] != null) {
           playSound("bgm");
           notFirstSound = true;
       }
