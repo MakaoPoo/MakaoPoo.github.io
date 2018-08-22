@@ -36,16 +36,9 @@
       mouthGraph[i] = new Image();
       mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
     }
-    var audioSourceList = {
-      vee1:"maki_chan/VEE1.wav",
-      vee2:"maki_chan/VEE2.wav",
-      bgm:"maki_chan/BGM.mp3"
-    };
-    var audioList = {};
-    for(var key in audioSourceList) {
-      audioList[key] = new Audio(audioSourceList[key]);
-    }
-    var testVee = new Audio("maki_chan/veePart1.wav");
+
+    var context = null;
+    var dogBarkingBuffer = [];
   }
   </script>
 </head>
@@ -72,14 +65,13 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
-      if(getCurrentTime("bgm") > 20) {
+      if(1 > 20) {
         gamePart = 5;
         scale  = 1;
       }
       scale += frame/10000;
     }
     draw();
-    checkSound()
     setTimeout(main, 0);
   }
   function draw() {
@@ -136,9 +128,7 @@
       if (count == 0) {
         brow = (brow + 1) % 4;
         if(!touch) {
-          if(testVee.currentTime == 0) {
-            testVee.play();
-          }
+          playAudio(1);
           // playSound("vee1");
         }
       }
@@ -147,29 +137,29 @@
       if(count > speed/2) count = 0;
       if (count == 0) {
         mouth = (mouth + 1) % 4;
-        if(getCurrentTime("vee2") > 0.58 && !touch) {
-          playSound("vee1");
-        }
+        // if(getCurrentTime("vee2") > 0.58 && !touch) {
+        //   // playSound("vee1");
+        // }
       }
       break;
     case 3:
       if(count > speed/4) count = 0;
       if (count == 0) {
         eye = (eye + 1) % 4;
-        if(getCurrentTime("vee2") > 0.58 && !touch) {
-          playSound("vee1");
-        }
+        // if(getCurrentTime("vee2") > 0.58 && !touch) {
+        //   // playSound("vee1");
+        // }
       }
       break;
     }
     if(touch) {
       if(gamePart < 4) {
         if(gamePart > 0) {
-          pauseAllVee1();
-          playSound("vee2");
+          // pauseAllVee1();
+          // playSound("vee2");
 
           if(gamePart == 3) {
-            playSound("bgm");
+            // playSound("bgm");
           }
         }
         gamePart++;
@@ -183,53 +173,6 @@
     height = $('body').height();
     draw();
   })
-
-  function checkSound() {
-    if(testVee.currentTime >= testVee.duration - 0.05) {
-      testVee.currentTime = 0.91;
-    }
-    // if(playingVee1.length > 3) {
-    // playtime = [0.45, 0.18, 0.08];
-    for(var i=0; i<playingVee1.length; i++){
-      var volume = (0.50-playingVee1[i].currentTime*gamePart)/0.5;
-      if(volume < 0) volume = 0;
-      playingVee1[i].volume = volume;
-      // if(playingVee1[i].currentTime > playtime[gamePart-1]) {
-      //   playingVee1[i].pause();
-      //   playingVee1[i].currentTime = playingVee1[i].duration
-      // }
-    }
-    //   playingVee1.splice(0, playingVee1.length - 3);
-    // }
-    for(var i in playingVee1) {
-      if(playingVee1[i].currentTime == playingVee1[i].duration) {
-        playingVee1.splice(i, 1);
-      }
-    }
-  }
-
-  function playSound(name) {
-    var volume = {vee1: 0.5, vee2: 0.5, bgm: 0.7};
-    audioList[name].volume = volume[name];
-    audioList[name].currentTime = 0;
-    audioList[name].play();
-
-    if(name == "vee1") {
-      playingVee1.push(audioList[name]);
-      audioList[name] = new Audio(audioSourceList[name]);
-    }
-  }
-
-  function getCurrentTime(name) {
-    return audioList[name].currentTime;
-  }
-
-  function pauseAllVee1() {
-    for(var i in playingVee1) {
-      playingVee1[i].pause();
-    }
-    playingVee1 = [];
-  }
 
   $(window).on('load', function(){
     width = $('body').width();
@@ -263,11 +206,50 @@
     draw();
   });
   function start(){
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      context = new AudioContext();
+    }
+    catch(e) {
+        context = null;
+        alert("このブラウザではWeb Audio APIがサポートされていません。");
+    }
+    loadSound("maki_chan/VEE1.wav");
+    loadSound("maki_chan/VEE2.wav");
+
+
     brow = 0;
     eye = -1;
     mouth = -1;
     main();
   }
+
+  function loadSound(url){
+        if (!context) { return; }
+        var request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.responseType = 'arraybuffer';
+        request.onload = function() {
+            context.decodeAudioData(
+                request.response,
+                function(buffer) {
+                    dogBarkingBuffer.push(buffer);
+                },
+                function()
+                {
+                    alert("音声ファイルの読み込みに失敗しました。");
+                });
+        }
+        request.send();
+    }
+
+    function playAudio(num){
+        if (!dogBarkingBuffer) { return; }
+        var source = context.createBufferSource();
+        source.buffer = dogBarkingBuffer[num];
+        source.connect(context.destination);
+        source.start(0); // 同じ音声ならstartだけでも良い？
+    }
   function getRand(max, min){
     var rand = Math.floor( Math.random() * (max + 1 - min) ) + min ;
     return rand;
