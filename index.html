@@ -36,17 +36,20 @@
       mouthGraph[i] = new Image();
       mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
     }
-
-    var context = null;
-    var dogBarkingBuffer = [];
   }
   </script>
 </head>
-
 <body>
   <canvas id="canvas"></canvas>
 
   <script>
+  var context = null;
+  var soundBuffList = {};
+  var soundList = {
+    vee1: "maki_chan/VEE1.wav",
+    vee2: "maki_chan/VEE2.wav",
+    bgm : "maki_chan/BGM.mp3"
+  }
   var width = 640;
   var height = 480;
   var scale = 1;
@@ -128,7 +131,7 @@
       if (count == 0) {
         brow = (brow + 1) % 4;
         if(!touch) {
-          playAudio(1);
+          playAudio("vee1");
           // playSound("vee1");
         }
       }
@@ -138,6 +141,7 @@
       if (count == 0) {
         mouth = (mouth + 1) % 4;
         // if(getCurrentTime("vee2") > 0.58 && !touch) {
+          playAudio("vee1");
         //   // playSound("vee1");
         // }
       }
@@ -147,6 +151,7 @@
       if (count == 0) {
         eye = (eye + 1) % 4;
         // if(getCurrentTime("vee2") > 0.58 && !touch) {
+          playAudio("vee1");
         //   // playSound("vee1");
         // }
       }
@@ -156,9 +161,11 @@
       if(gamePart < 4) {
         if(gamePart > 0) {
           // pauseAllVee1();
+            playAudio("vee2");
           // playSound("vee2");
 
           if(gamePart == 3) {
+            playAudio("bgm");
             // playSound("bgm");
           }
         }
@@ -206,16 +213,10 @@
     draw();
   });
   function start(){
-    try {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      context = new AudioContext();
-    }
-    catch(e) {
-        context = null;
-        alert("このブラウザではWeb Audio APIがサポートされていません。");
-    }
-    loadSound("maki_chan/VEE1.wav");
-    loadSound("maki_chan/VEE2.wav");
+    initWebAPI();
+    loadSound("vee1");
+    loadSound("vee2");
+    loadSound("bgm");
 
 
     brow = 0;
@@ -224,32 +225,44 @@
     main();
   }
 
-  function loadSound(url){
+  function initWebAPI() {
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      context = new AudioContext();
+    }
+    catch(e) {
+        context = null;
+        alert("このブラウザではWeb Audio APIがサポートされていません。");
+    }
+  }
+
+  function loadSound(name){
         if (!context) { return; }
         var request = new XMLHttpRequest();
+        var url = soundList[name];
         request.open('GET', url, true);
         request.responseType = 'arraybuffer';
         request.onload = function() {
             context.decodeAudioData(
                 request.response,
                 function(buffer) {
-                    dogBarkingBuffer.push(buffer);
+                    soundBuffList[name] = buffer;
                 },
-                function()
-                {
+                function() {
                     alert("音声ファイルの読み込みに失敗しました。");
                 });
         }
         request.send();
     }
 
-    function playAudio(num){
-        if (!dogBarkingBuffer) { return; }
-        var source = context.createBufferSource();
-        source.buffer = dogBarkingBuffer[num];
-        source.connect(context.destination);
-        source.start(0); // 同じ音声ならstartだけでも良い？
-    }
+  function playAudio(name){
+      if (!soundBuffList) { return; }
+      var source = context.createBufferSource();
+      source.buffer = soundBuffList[name];
+      source.connect(context.destination);
+      source.start(0);
+  }
+
   function getRand(max, min){
     var rand = Math.floor( Math.random() * (max + 1 - min) ) + min ;
     return rand;
