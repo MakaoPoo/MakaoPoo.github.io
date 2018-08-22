@@ -72,9 +72,6 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
-      if(getCurrentTime("bgm") == 0) {
-        playSound("bgm");
-      }
       if(getCurrentTime("bgm") > 20) {
         gamePart = 5;
         scale  = 1;
@@ -170,6 +167,10 @@
         if(gamePart > 0) {
           pauseAllVee1();
           playSound("vee2");
+
+          if(gamePart == 3) {
+            playSound("bgm");
+          }
         }
         gamePart++;
         count = -1;
@@ -191,9 +192,7 @@
       playingVee1.splice(0, playingVee1.length - 3);
     }
     for(var i in playingVee1) {
-      console.log(playingVee1[i].currentTime + "/" + playingVee1[i].duration)
       if(playingVee1[i].currentTime == playingVee1[i].duration) {
-        console.log("splice");
         playingVee1.splice(i, 1);
       }
     }
