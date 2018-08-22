@@ -28,7 +28,7 @@
     var eyeGraph = new Array(4);
     var mouthGraph = new Array(4);
     for(var i=0; i<4; i++) {
-      var index = i+1
+      var index = i+1;
       browGraph[i] = new Image();
       browGraph[i].src = "maki_chan/brow"+ index +".png";
       eyeGraph[i] = new Image();
@@ -219,9 +219,9 @@
         });
       }
     };
-    brow = getRand(0,3);
-    eye = getRand(0,3);
-    mouth = getRand(0,3);
+    brow = getRand(3,0);
+    eye = getRand(3,0);
+    mouth = getRand(3,0);
     draw();
   });
   function start(){
