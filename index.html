@@ -36,17 +36,21 @@
       mouthGraph[i] = new Image();
       mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
     }
+    var audioSourceList = {
+      vee1:"maki_chan/VEE1.wav",
+      vee2:"maki_chan/VEE2.wav",
+      bgm:"maki_chan/BGM.mp3"
+    };
+    var audioList = {};
+    for(var key in audioSourceList) {
+      audioList[key] = new Audio(audioSourceList[key]);
+    }
   }
   </script>
 </head>
 
 <body>
   <canvas id="canvas"></canvas>
-  <AUDIO id="vee1-1" src="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO id="vee1-2" src="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO id="vee1-3" src="maki_chan/VEE1.wav"></AUDIO>
-  <AUDIO id="vee2" src="maki_chan/VEE2.wav"></AUDIO>
-  <AUDIO id="bgm" src="maki_chan/BGM.mp3"></AUDIO>
 
   <script>
   var width = 640;
@@ -58,6 +62,7 @@
   var count = 0;
   var veeCount = 0;
   var touch = false;
+  var playingVee1 = [];
 
   function main(){
     var day = new Date();
@@ -67,14 +72,17 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
-      document.getElementById('bgm').play();
-      if(document.getElementById('bgm').currentTime > 20) {
+      if(getCurrentTime("bgm") == 0) {
+        playSound("bgm");
+      }
+      if(getCurrentTime("bgm") > 20) {
         gamePart = 5;
         scale  = 1;
       }
       scale += frame/10000;
     }
     draw();
+    checkSound()
     setTimeout(main, 0);
   }
   function draw() {
@@ -132,8 +140,7 @@
         brow = (brow + 1) % 4;
         if(!touch) {
           veeCount = (veeCount+1)%3;
-          document.getElementById('vee1-'+(veeCount+1)).currentTime = 0;
-          document.getElementById('vee1-'+(veeCount+1)).play();
+          playSound("vee1");
         }
       }
       break;
@@ -141,10 +148,9 @@
       if(count > speed/2) count = 0;
       if (count == 0) {
         mouth = (mouth + 1) % 4;
-        if(document.getElementById('vee2').currentTime>0.58 && !touch) {
+        if(getCurrentTime("vee2") > 0.58 && !touch) {
           veeCount = (veeCount+1)%3;
-          document.getElementById('vee1-'+(veeCount+1)).currentTime = 0;
-          document.getElementById('vee1-'+(veeCount+1)).play();
+          playSound("vee1");
         }
       }
       break;
@@ -152,10 +158,9 @@
       if(count > speed/4) count = 0;
       if (count == 0) {
         eye = (eye + 1) % 4;
-        if(document.getElementById('vee2').currentTime>0.58 && !touch) {
+        if(getCurrentTime("vee2") > 0.58 && !touch) {
           veeCount = (veeCount+1)%3;
-          document.getElementById('vee1-'+(veeCount+1)).currentTime = 0;
-          document.getElementById('vee1-'+(veeCount+1)).play();
+          playSound("vee1");
         }
       }
       break;
@@ -163,11 +168,8 @@
     if(touch) {
       if(gamePart < 4) {
         if(gamePart > 0) {
-          for(var i = 0; i<3; i++) {
-            document.getElementById('vee1-'+(i+1)).pause();
-          }
-          document.getElementById('vee2').currentTime = 0;
-          document.getElementById('vee2').play();
+          pauseAllVee1();
+          playSound("vee2");
         }
         gamePart++;
         count = -1;
@@ -180,13 +182,47 @@
     height = $('body').height();
     draw();
   })
-  $(window).on('load', function(){
-    document.getElementById('vee1-1').volume = 0.5;
-    document.getElementById('vee1-2').volume = 0.5;
-    document.getElementById('vee1-3').volume = 0.5;
-    document.getElementById('vee2').volume = 0.5;
-    document.getElementById('bgm').volume = 0.7;
 
+  function checkSound() {
+    if(playingVee1.length > 3) {
+      for(var i=0; i<playingVee1.length - 3; i++){
+        playingVee1[i].pause();
+      }
+      playingVee1.splice(0, playingVee1.length - 3);
+    }
+    for(var i in playingVee1) {
+      console.log(playingVee1[i].currentTime + "/" + playingVee1[i].duration)
+      if(playingVee1[i].currentTime == playingVee1[i].duration) {
+        console.log("splice");
+        playingVee1.splice(i, 1);
+      }
+    }
+  }
+
+  function playSound(name) {
+    var volume = {vee1: 0.5, vee2: 0.5, bgm: 0.7};
+    audioList[name] = new Audio(audioSourceList[name]);
+    audioList[name].volume = volume[name];
+    audioList[name].currentTime = 0;
+    audioList[name].play();
+
+    if(name == "vee1") {
+      playingVee1.push(audioList[name]);
+    }
+  }
+
+  function getCurrentTime(name) {
+    return audioList[name].currentTime;
+  }
+
+  function pauseAllVee1() {
+    for(var i in playingVee1) {
+      playingVee1[i].pause();
+    }
+    playingVee1 = [];
+  }
+
+  $(window).on('load', function(){
     width = $('body').width();
     height = $('body').height();
 
@@ -218,12 +254,6 @@
     draw();
   });
   function start(){
-    // document.getElementById('vee1-1').load();
-    // document.getElementById('vee1-2').load();
-    // document.getElementById('vee1-3').load();
-    // document.getElementById('vee2').load();
-    // document.getElementById('bgm').load();
-
     brow = 0;
     eye = -1;
     mouth = -1;
