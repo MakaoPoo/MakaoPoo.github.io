@@ -185,12 +185,16 @@
   })
 
   function checkSound() {
-    if(playingVee1.length > 3) {
-      for(var i=0; i<playingVee1.length - 3; i++){
+    // if(playingVee1.length > 3) {
+    playtime = [0.50, 0.14, 0.06];
+    for(var i=0; i<playingVee1.length; i++){
+      if(playingVee1[i].currentTime > playtime[gamePart-1]) {
         playingVee1[i].pause();
+        playingVee1[i].currentTime = playingVee1[i].duration
       }
-      playingVee1.splice(0, playingVee1.length - 3);
     }
+    //   playingVee1.splice(0, playingVee1.length - 3);
+    // }
     for(var i in playingVee1) {
       if(playingVee1[i].currentTime == playingVee1[i].duration) {
         playingVee1.splice(i, 1);
