@@ -186,12 +186,15 @@
 
   function checkSound() {
     // if(playingVee1.length > 3) {
-    playtime = [0.50, 0.14, 0.06];
+    // playtime = [0.45, 0.18, 0.08];
     for(var i=0; i<playingVee1.length; i++){
-      if(playingVee1[i].currentTime > playtime[gamePart-1]) {
-        playingVee1[i].pause();
-        playingVee1[i].currentTime = playingVee1[i].duration
-      }
+      var volume = (0.50-playingVee1[i].currentTime*gamePart)/0.5;
+      if(volume < 0) volume = 0;
+      playingVee1[i].volume = volume;
+      // if(playingVee1[i].currentTime > playtime[gamePart-1]) {
+      //   playingVee1[i].pause();
+      //   playingVee1[i].currentTime = playingVee1[i].duration
+      // }
     }
     //   playingVee1.splice(0, playingVee1.length - 3);
     // }
