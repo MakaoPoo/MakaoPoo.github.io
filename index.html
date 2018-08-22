@@ -45,6 +45,7 @@
     for(var key in audioSourceList) {
       audioList[key] = new Audio(audioSourceList[key]);
     }
+    var testVee = new Audio("maki_chan/veePart1.wav");
   }
   </script>
 </head>
@@ -60,7 +61,6 @@
   var brow = 0, eye = 0, mouth = 0;
   var gamePart = 0;
   var count = 0;
-  var veeCount = 0;
   var touch = false;
   var playingVee1 = [];
 
@@ -136,8 +136,10 @@
       if (count == 0) {
         brow = (brow + 1) % 4;
         if(!touch) {
-          veeCount = (veeCount+1)%3;
-          playSound("vee1");
+          if(testVee.currentTime == 0) {
+            testVee.play();
+          }
+          // playSound("vee1");
         }
       }
       break;
@@ -146,7 +148,6 @@
       if (count == 0) {
         mouth = (mouth + 1) % 4;
         if(getCurrentTime("vee2") > 0.58 && !touch) {
-          veeCount = (veeCount+1)%3;
           playSound("vee1");
         }
       }
@@ -156,7 +157,6 @@
       if (count == 0) {
         eye = (eye + 1) % 4;
         if(getCurrentTime("vee2") > 0.58 && !touch) {
-          veeCount = (veeCount+1)%3;
           playSound("vee1");
         }
       }
@@ -185,6 +185,9 @@
   })
 
   function checkSound() {
+    if(testVee.currentTime >= testVee.duration - 0.05) {
+      testVee.currentTime = 0.91;
+    }
     // if(playingVee1.length > 3) {
     // playtime = [0.45, 0.18, 0.08];
     for(var i=0; i<playingVee1.length; i++){
@@ -207,13 +210,13 @@
 
   function playSound(name) {
     var volume = {vee1: 0.5, vee2: 0.5, bgm: 0.7};
-    audioList[name] = new Audio(audioSourceList[name]);
     audioList[name].volume = volume[name];
     audioList[name].currentTime = 0;
     audioList[name].play();
 
     if(name == "vee1") {
       playingVee1.push(audioList[name]);
+      audioList[name] = new Audio(audioSourceList[name]);
     }
   }
 
