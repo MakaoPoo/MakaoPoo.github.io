@@ -36,6 +36,49 @@
       mouthGraph[i] = new Image();
       mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
     }
+
+    var context = null;
+    var soundBuffList = {};
+    var soundList = {
+      vee1: "maki_chan/VEE1.wav",
+      vee2: "maki_chan/VEE2.wav",
+      bgm : "maki_chan/BGM.mp3"
+    }
+
+    initWebAPI();
+    loadSound("vee1");
+    loadSound("vee2");
+    loadSound("bgm");
+    
+    function initWebAPI() {
+      try {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        context = new AudioContext();
+      }
+      catch(e) {
+        context = null;
+        alert("このブラウザではWeb Audio APIがサポートされていません。");
+      }
+    }
+
+    function loadSound(name){
+      if (!context) { return; }
+      var request = new XMLHttpRequest();
+      var url = soundList[name];
+      request.open('GET', url, true);
+      request.responseType = 'arraybuffer';
+      request.onload = function() {
+        context.decodeAudioData(
+          request.response,
+          function(buffer) {
+            soundBuffList[name] = buffer;
+          },
+          function() {
+            alert("音声ファイルの読み込みに失敗しました。");
+          });
+      }
+      request.send();
+    }
   }
   </script>
 </head>
@@ -43,13 +86,6 @@
   <canvas id="canvas"></canvas>
 
   <script>
-  var context = null;
-  var soundBuffList = {};
-  var soundList = {
-    vee1: "maki_chan/VEE1.wav",
-    vee2: "maki_chan/VEE2.wav",
-    bgm : "maki_chan/BGM.mp3"
-  }
   var width = 640;
   var height = 480;
   var scale = 1;
@@ -71,10 +107,6 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
-      if(!notFirstSound && soundBuffList["bgm"] != null) {
-          playSound("bgm");
-          notFirstSound = true;
-      }
       if(getCurrentTime() > 20) {
         gamePart = 5;
         scale  = 1;
@@ -180,6 +212,9 @@
       if(gamePart < 4) {
         if(gamePart > 0) {
           playSound("vee2");
+          if(gamePart == 3) {
+            playSound("bgm");
+          }
           notFirstSound = false;
         }
         gamePart++;
@@ -226,45 +261,10 @@
     draw();
   });
   function start(){
-    initWebAPI();
-    loadSound("vee1");
-    loadSound("vee2");
-    loadSound("bgm");
-
     brow = 0;
     eye = -1;
     mouth = -1;
     main();
-  }
-
-  function initWebAPI() {
-    try {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      context = new AudioContext();
-    }
-    catch(e) {
-      context = null;
-      alert("このブラウザではWeb Audio APIがサポートされていません。");
-    }
-  }
-
-  function loadSound(name){
-    if (!context) { return; }
-    var request = new XMLHttpRequest();
-    var url = soundList[name];
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-    request.onload = function() {
-      context.decodeAudioData(
-        request.response,
-        function(buffer) {
-          soundBuffList[name] = buffer;
-        },
-        function() {
-          alert("音声ファイルの読み込みに失敗しました。");
-        });
-    }
-    request.send();
   }
 
   function playSound(name, time=-1){
