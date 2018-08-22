@@ -71,6 +71,10 @@
     startFrame = lastFrame;
     guruguru(frame);
     if(gamePart == 4) {
+      if(!notFirstSound) {
+          playSound("bgm");
+          notFirstSound = true;
+      }
       if(getCurrentTime() > 20) {
         gamePart = 5;
         scale  = 1;
@@ -176,9 +180,6 @@
       if(gamePart < 4) {
         if(gamePart > 0) {
           playSound("vee2");
-          if(gamePart == 3) {
-            playSound("bgm");
-          }
           notFirstSound = false;
         }
         gamePart++;
