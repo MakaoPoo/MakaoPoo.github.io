@@ -89,6 +89,7 @@
   <script>
   var width = 640;
   var height = 480;
+  var sc, cx, cy;
   var scale = 1;
   var startFrame = -1;
   var brow = 0, eye = 0, mouth = 0;
@@ -123,9 +124,8 @@
     canvas.setAttribute("width", width);
     canvas.setAttribute("height", height);
 
-    var sc;
-    var cx = width/2;
-    var cy = height/2;
+    cx = width/2;
+    cy = height/2;
     if(height / width < 0.75) {
       ctx.font =  height/9+"px 'ＭＳ ゴシック'";
       sc = height/480;
@@ -221,14 +221,6 @@
     height = $('body').height();
 
     var loadStart = new Date();
-    while(Object.keys(soundBuffList).length != Object.keys(soundList).length) {
-      console.log("NowLoading " + Object.keys(soundBuffList).length + "/" + Object.keys(soundList).length);
-      if(new Date() - loadStart > 10000) {
-        alert("読み込み失敗");
-        return;
-      }
-    }
-    console.log("LoadingOK " + Object.keys(soundBuffList).length + "/" + Object.keys(soundList).length);
 
     var device = ["iPhone", "iPad", "iPod", "Android"];
     for(var i=0; i<device.length; i++){
@@ -255,9 +247,49 @@
     brow = getRand(3,0);
     eye = getRand(3,0);
     mouth = getRand(3,0);
-    draw();
+
+    loading();
   });
+
+  var loadStr = ["N","o","w"," ","L","o","a","d","i","n","g"];
+  var loadCount = 0;
+  var loadY = new Array(loadStr.length);
+  function loading() {
+    draw();
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+
+    if(Object.keys(soundBuffList).length == Object.keys(soundList).length) {
+      return;
+    }
+
+    var jumpSpan = 5;
+    var jumpTime = 30;
+    var center = jumpTime/2;
+    for(var i=0; i<loadStr.length; i++) {
+      if(jumpSpan*i <= loadCount && loadCount < jumpSpan*i + jumpTime) {
+        var relCount = loadCount - jumpSpan*i - center;
+        var jumpMax = 50;
+
+        loadY[i] = (center*center - relCount*relCount) / (center*center) * jumpMax;
+      } else {
+        loadY[i] = 0;
+      }
+    }
+    var waitTime = 50;
+    loadCount = (loadCount + 1) % (jumpSpan*(loadStr.length-1) + jumpTime + waitTime);
+
+    ctx.fillStyle="#ffffff";
+    for(var i=0; i<loadStr.length; i++) {
+      ctx.fillText(loadStr[i], cx+(-155 + i*27)*sc, cy+(50 - loadY[i])*sc);
+    }
+    setTimeout(loading, 10);
+  }
+
   function start(){
+    if(Object.keys(soundBuffList).length != Object.keys(soundList).length) {
+      return;
+    }
     brow = 0;
     eye = -1;
     mouth = -1;
