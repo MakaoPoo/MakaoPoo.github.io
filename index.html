@@ -61,6 +61,7 @@
   var startTime = 0;
   var prevSoundTime = 0;
 
+  var onloadFlag = false;
   var loadStr = ["N","o","w"," ","L","o","a","d","i","n","g"];
   var loadCount = 0;
   var loadY = new Array(loadStr.length);
@@ -85,43 +86,36 @@
   function draw() {
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
-    canvas.setAttribute("width", width);
-    canvas.setAttribute("height", height);
-    cx = width/2;
-    cy = height/2;
-    if(height / width < 0.75) {
-      ctx.font =  height/9+"px 'ＭＳ ゴシック'";
-      sc = height/480;
-    } else {
-      ctx.font =  width/12+"px 'ＭＳ ゴシック'";
-      sc = width/640;
-    }
-    if(gamePart < 5) {
-      var sx, sy, sw ,sh;
-      sx = cx + (-320 + 0)*scale*sc; sy = cy + (-240 + 0)*scale*sc;
-      sw = 640*sc*scale; sh = 480*sc*scale;
-      ctx.drawImage(backGraph,sx ,sy ,sw ,sh );
-      if(brow != -1) {
-        sx = cx + (-320 + 180)*scale*sc; sy = cy + (-240 + 150)*scale*sc;
-        sw = 260*sc*scale; sh = 70*sc*scale;
-        ctx.drawImage(browGraph[brow],sx ,sy ,sw ,sh );
+    ctx.fillStyle="#000000";
+    ctx.fillRect(0, 0, width, height);
+    if(onloadFlag) {
+      if(gamePart < 5) {
+        var sx, sy, sw ,sh;
+        sx = cx + (-320 + 0)*scale*sc; sy = cy + (-240 + 0)*scale*sc;
+        sw = 640*sc*scale; sh = 480*sc*scale;
+        ctx.drawImage(backGraph,sx ,sy ,sw ,sh );
+        if(brow != -1) {
+          sx = cx + (-320 + 180)*scale*sc; sy = cy + (-240 + 150)*scale*sc;
+          sw = 260*sc*scale; sh = 70*sc*scale;
+          ctx.drawImage(browGraph[brow],sx ,sy ,sw ,sh );
+        }
+        if(eye != -1) {
+          sx = cx + (-320 + 180)*scale*sc; sy = cy + (-240 + 190)*scale*sc;
+          sw = 260*sc*scale; sh = 100*sc*scale;
+          ctx.drawImage(eyeGraph[eye],sx ,sy ,sw ,sh );
+        }
+        if(mouth != -1) {
+          sx = cx + (-320 + 270)*scale*sc; sy = cy + (-240 + 310)*scale*sc;
+          sw = 90*sc*scale; sh = 50*sc*scale;
+          ctx.drawImage(mouthGraph[mouth],sx ,sy ,sw ,sh );
+        }
+            sx = cx + (-320 + 0)*scale*sc; sy = cy + (-240 + 0)*scale*sc;
+        sw = 640*sc*scale; sh = 480*sc*scale;
+        ctx.drawImage(hairGraph,sx ,sy ,sw ,sh );
+      } else {
+        ctx.fillStyle="#ffffff";
+        ctx.fillText("真姫ちゃんかわいい", cx-300*sc, cy+70*sc);
       }
-      if(eye != -1) {
-        sx = cx + (-320 + 180)*scale*sc; sy = cy + (-240 + 190)*scale*sc;
-        sw = 260*sc*scale; sh = 100*sc*scale;
-        ctx.drawImage(eyeGraph[eye],sx ,sy ,sw ,sh );
-      }
-      if(mouth != -1) {
-        sx = cx + (-320 + 270)*scale*sc; sy = cy + (-240 + 310)*scale*sc;
-        sw = 90*sc*scale; sh = 50*sc*scale;
-        ctx.drawImage(mouthGraph[mouth],sx ,sy ,sw ,sh );
-      }
-          sx = cx + (-320 + 0)*scale*sc; sy = cy + (-240 + 0)*scale*sc;
-      sw = 640*sc*scale; sh = 480*sc*scale;
-      ctx.drawImage(hairGraph,sx ,sy ,sw ,sh );
-    } else {
-      ctx.fillStyle="#ffffff";
-      ctx.fillText("真姫ちゃんかわいい", cx-300*sc, cy+70*sc);
     }
   }
   function guruguru(frame) {
@@ -176,15 +170,29 @@
   $(window).resize(function() {
     width = $('body').width();
     height = $('body').height();
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+    canvas.setAttribute("width", width);
+    canvas.setAttribute("height", height);
+    cx = width/2;
+    cy = height/2;
+    if(height / width < 0.75) {
+      ctx.font =  height/9+"px 'ＭＳ ゴシック'";
+      sc = height/480;
+    } else {
+      ctx.font =  width/12+"px 'ＭＳ ゴシック'";
+      sc = width/640;
+    }
     draw();
   })
   $(window).on('load', function(){
-    width = $('body').width();
-    height = $('body').height();
+    onloadFlag = true;
+
     initWebAPI();
     loadSound("vee1");
     loadSound("vee2");
     loadSound("bgm");
+
     var device = ["iPhone", "iPad", "iPod", "Android"];
     for(var i=0; i<device.length; i++){
       if (navigator.userAgent.indexOf(device[i])>0){
@@ -210,15 +218,20 @@
     brow = getRand(3,0);
     eye = getRand(3,0);
     mouth = getRand(3,0);
+  });
+  $(document).ready(function() {
+    $(window).trigger('resize');
     loading();
   });
   function loading() {
     draw();
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
-    if(Object.keys(soundBuffList).length == Object.keys(soundList).length) {
+    if(onloadFlag && Object.keys(soundBuffList).length == Object.keys(soundList).length) {
       return;
     }
+      console.log("aaa");
+
     var jumpSpan = 5;
     var jumpTime = 30;
     var center = jumpTime/2;
