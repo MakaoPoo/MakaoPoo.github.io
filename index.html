@@ -44,43 +44,7 @@
     vee1: "maki_chan/VEE1.wav",
     vee2: "maki_chan/VEE2.wav",
     bgm : "maki_chan/BGM.mp3"
-  }
-
-  function initWebAPI() {
-    try {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      context = new AudioContext();
-    }
-    catch(e) {
-      context = null;
-      alert("このブラウザではWeb Audio APIがサポートされていません。");
-    }
-  }
-  function loadSound(name){
-    if (!context) { return; }
-    var request = new XMLHttpRequest();
-    var url = soundList[name];
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-    request.onload = function() {
-      context.decodeAudioData(
-        request.response,
-        function(buffer) {
-          soundBuffList[name] = buffer;
-        },
-        function() {
-          alert("音声ファイルの読み込みに失敗しました。");
-        });
-    }
-    request.send();
-  }
-
-  $(function() {
-    initWebAPI();
-    loadSound("vee1");
-    loadSound("vee2");
-    loadSound("bgm");
-  });
+  };
   </script>
 </head>
 <body>
@@ -96,9 +60,13 @@
   var gamePart = 0;
   var count = 0;
   var touch = false;
-  var playingVee1 = [];
+
   var startTime = 0;
   var prevSoundTime = 0;
+
+  var loadStr = ["N","o","w"," ","L","o","a","d","i","n","g"];
+  var loadCount = 0;
+  var loadY = new Array(loadStr.length);
 
   function main(){
     var day = new Date();
@@ -217,10 +185,13 @@
   })
 
   $(window).on('load', function(){
+    initWebAPI();
+    loadSound("vee1");
+    loadSound("vee2");
+    loadSound("bgm");
+
     width = $('body').width();
     height = $('body').height();
-
-    var loadStart = new Date();
 
     var device = ["iPhone", "iPad", "iPod", "Android"];
     for(var i=0; i<device.length; i++){
@@ -251,9 +222,6 @@
     loading();
   });
 
-  var loadStr = ["N","o","w"," ","L","o","a","d","i","n","g"];
-  var loadCount = 0;
-  var loadY = new Array(loadStr.length);
   function loading() {
     draw();
     var canvas = document.getElementById("canvas");
@@ -296,9 +264,40 @@
     main();
   }
 
+  function initWebAPI() {
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      context = new AudioContext();
+    }
+    catch(e) {
+      context = null;
+      alert("このブラウザではWeb Audio APIがサポートされていません。");
+    }
+  }
+
+  function loadSound(name){
+    if (!context) { return; }
+    var request = new XMLHttpRequest();
+    var url = soundList[name];
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    request.onload = function() {
+      context.decodeAudioData(
+        request.response,
+        function(buffer) {
+          soundBuffList[name] = buffer;
+        },
+        function() {
+          alert("音声ファイルの読み込みに失敗しました。");
+        });
+    }
+    request.send();
+  }
+
   function playSound(name, time=-1){
     if (!soundBuffList) { return; }
     var source = context.createBufferSource();
+
     source.buffer = soundBuffList[name];
     source.connect(context.destination);
     if(time > 0) {
