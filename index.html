@@ -13,14 +13,11 @@
   <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-      // 登録成功
       // console.log('ServiceWorker registration successful with scope: ', registration.scope);
     }).catch(function(err) {
-      // 登録失敗 :(
       console.log('ServiceWorker registration failed: ', err);
     });
   }
-
   var backGraph = new Image();
   backGraph.src = "maki_chan/back.png";
   var hairGraph = new Image();
@@ -37,50 +34,13 @@
     mouthGraph[i] = new Image();
     mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
   }
-
   var context = null;
   var soundBuffList = {};
   var soundList = {
     vee1: "maki_chan/VEE1.wav",
     vee2: "maki_chan/VEE2.wav",
     bgm : "maki_chan/BGM.mp3"
-<<<<<<< HEAD
-  };
-=======
   }
-
-  function initWebAPI() {
-    try {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      context = new AudioContext();
-    }
-    catch(e) {
-      context = null;
-      alert("このブラウザではWeb Audio APIがサポートされていません。");
-    }
-  }
-  function loadSound(name){
-    if (!context) { return; }
-    var request = new XMLHttpRequest();
-    var url = soundList[name];
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-    request.onload = function() {
-      context.decodeAudioData(
-        request.response,
-        function(buffer) {
-          soundBuffList[name] = buffer;
-        },
-        function() {
-          alert("音声ファイルの読み込みに失敗しました。");
-        });
-    }
-    request.send();
-  }
-
-  $(function() {
-  });
->>>>>>> bd3e2d238c1241584d01dcab28dc69defef101b3
   </script>
 </head>
 <body>
@@ -91,6 +51,7 @@
   var height = 480;
   var sc, cx, cy;
   var scale = 1;
+
   var startFrame = -1;
   var brow = 0, eye = 0, mouth = 0;
   var gamePart = 0;
@@ -124,10 +85,8 @@
   function draw() {
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
-
     canvas.setAttribute("width", width);
     canvas.setAttribute("height", height);
-
     cx = width/2;
     cy = height/2;
     if(height / width < 0.75) {
@@ -219,24 +178,13 @@
     height = $('body').height();
     draw();
   })
-
   $(window).on('load', function(){
-    initWebAPI();
-    loadSound("vee1");
-    loadSound("vee2");
-    loadSound("bgm");
-
     width = $('body').width();
     height = $('body').height();
-
-<<<<<<< HEAD
-=======
     initWebAPI();
     loadSound("vee1");
     loadSound("vee2");
     loadSound("bgm");
-
->>>>>>> bd3e2d238c1241584d01dcab28dc69defef101b3
     var device = ["iPhone", "iPad", "iPod", "Android"];
     for(var i=0; i<device.length; i++){
       if (navigator.userAgent.indexOf(device[i])>0){
@@ -262,19 +210,15 @@
     brow = getRand(3,0);
     eye = getRand(3,0);
     mouth = getRand(3,0);
-
     loading();
   });
-
   function loading() {
     draw();
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
-
     if(Object.keys(soundBuffList).length == Object.keys(soundList).length) {
       return;
     }
-
     var jumpSpan = 5;
     var jumpTime = 30;
     var center = jumpTime/2;
@@ -282,7 +226,6 @@
       if(jumpSpan*i <= loadCount && loadCount < jumpSpan*i + jumpTime) {
         var relCount = loadCount - jumpSpan*i - center;
         var jumpMax = 50;
-
         loadY[i] = (center*center - relCount*relCount) / (center*center) * jumpMax;
       } else {
         loadY[i] = 0;
@@ -290,14 +233,12 @@
     }
     var waitTime = 50;
     loadCount = (loadCount + 1) % (jumpSpan*(loadStr.length-1) + jumpTime + waitTime);
-
     ctx.fillStyle="#ffffff";
     for(var i=0; i<loadStr.length; i++) {
       ctx.fillText(loadStr[i], cx+(-155 + i*27)*sc, cy+(50 - loadY[i])*sc);
     }
     setTimeout(loading, 10);
   }
-
   function start(){
     if(Object.keys(soundBuffList).length != Object.keys(soundList).length) {
       return;
@@ -307,7 +248,6 @@
     mouth = -1;
     main();
   }
-
   function initWebAPI() {
     try {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -318,7 +258,6 @@
       alert("このブラウザではWeb Audio APIがサポートされていません。");
     }
   }
-
   function loadSound(name){
     if (!context) { return; }
     var request = new XMLHttpRequest();
@@ -337,11 +276,9 @@
     }
     request.send();
   }
-
   function playSound(name, time=-1){
     if (!soundBuffList) { return; }
     var source = context.createBufferSource();
-
     source.buffer = soundBuffList[name];
     source.connect(context.destination);
     if(time > 0) {
@@ -349,16 +286,13 @@
     } else {
       source.start(0);
     }
-
     if(name == "vee2" || name == "bgm") {
       startTime = context.currentTime
     }
   }
-
   function getCurrentTime() {
     return context.currentTime - startTime;
   }
-
   function getRand(max, min){
     var rand = Math.floor( Math.random() * (max + 1 - min) ) + min ;
     return rand;
@@ -367,7 +301,7 @@
 
   <style>
   html {
-  user-select: none;
+    user-select: none;
   }
   body {
     position: fixed;
