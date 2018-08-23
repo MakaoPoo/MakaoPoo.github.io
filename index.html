@@ -44,7 +44,43 @@
     vee1: "maki_chan/VEE1.wav",
     vee2: "maki_chan/VEE2.wav",
     bgm : "maki_chan/BGM.mp3"
+<<<<<<< HEAD
   };
+=======
+  }
+
+  function initWebAPI() {
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      context = new AudioContext();
+    }
+    catch(e) {
+      context = null;
+      alert("このブラウザではWeb Audio APIがサポートされていません。");
+    }
+  }
+  function loadSound(name){
+    if (!context) { return; }
+    var request = new XMLHttpRequest();
+    var url = soundList[name];
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    request.onload = function() {
+      context.decodeAudioData(
+        request.response,
+        function(buffer) {
+          soundBuffList[name] = buffer;
+        },
+        function() {
+          alert("音声ファイルの読み込みに失敗しました。");
+        });
+    }
+    request.send();
+  }
+
+  $(function() {
+  });
+>>>>>>> bd3e2d238c1241584d01dcab28dc69defef101b3
   </script>
 </head>
 <body>
@@ -193,6 +229,14 @@
     width = $('body').width();
     height = $('body').height();
 
+<<<<<<< HEAD
+=======
+    initWebAPI();
+    loadSound("vee1");
+    loadSound("vee2");
+    loadSound("bgm");
+
+>>>>>>> bd3e2d238c1241584d01dcab28dc69defef101b3
     var device = ["iPhone", "iPad", "iPod", "Android"];
     for(var i=0; i<device.length; i++){
       if (navigator.userAgent.indexOf(device[i])>0){
