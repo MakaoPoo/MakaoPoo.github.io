@@ -38,6 +38,14 @@
     mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
   }
 
+  var context = null;
+  var soundBuffList = {};
+  var soundList = {
+    vee1: "maki_chan/VEE1.wav",
+    vee2: "maki_chan/VEE2.wav",
+    bgm : "maki_chan/BGM.mp3"
+  }
+
   function initWebAPI() {
     try {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -79,13 +87,6 @@
   <canvas id="canvas"></canvas>
 
   <script>
-  var context = null;
-  var soundBuffList = {};
-  var soundList = {
-    vee1: "maki_chan/VEE1.wav",
-    vee2: "maki_chan/VEE2.wav",
-    bgm : "maki_chan/BGM.mp3"
-  }
   var width = 640;
   var height = 480;
   var scale = 1;
@@ -97,7 +98,6 @@
   var playingVee1 = [];
   var startTime = 0;
   var prevSoundTime = 0;
-  var notFirstSound = false;
 
   function main(){
     var day = new Date();
@@ -170,11 +170,7 @@
       if (count == 0) {
         brow = (brow + 1) % 4;
         if(!touch) {
-          var span = getCurrentTime() - prevSoundTime;
-          if(notFirstSound){
-            playSound("vee1", span*4);
-          }
-          notFirstSound = true;
+          playSound("vee1", 0.55);
           prevSoundTime = getCurrentTime();
         }
       }
@@ -184,11 +180,7 @@
       if (count == 0) {
         mouth = (mouth + 1) % 4;
         if(getCurrentTime() > 0.58 && !touch) {
-          var span = getCurrentTime() - prevSoundTime;
-          if(notFirstSound){
-            playSound("vee1", span*2.2);
-          }
-          notFirstSound = true;
+          playSound("vee1", 0.16);
           prevSoundTime = getCurrentTime();
         }
       }
@@ -198,11 +190,7 @@
       if (count == 0) {
         eye = (eye + 1) % 4;
         if(getCurrentTime()> 0.58 && !touch) {
-          var span = getCurrentTime() - prevSoundTime;
-          if(notFirstSound){
-            playSound("vee1", span*3);
-          }
-          notFirstSound = true;
+          playSound("vee1", 0.10);
           prevSoundTime = getCurrentTime();
         }
       }
@@ -215,7 +203,6 @@
           if(gamePart == 3) {
             playSound("bgm");
           }
-          notFirstSound = false;
         }
         gamePart++;
         count = -1;
@@ -233,31 +220,35 @@
     width = $('body').width();
     height = $('body').height();
 
+    var loadStart = new Date();
+    while(Object.keys(soundBuffList).length != Object.keys(soundList).length) {
+      console.log("NowLoading " + Object.keys(soundBuffList).length + "/" + Object.keys(soundList).length);
+      if(new Date() - loadStart > 10000) {
+        alert("読み込み失敗");
+        return;
+      }
+    }
+    console.log("LoadingOK " + Object.keys(soundBuffList).length + "/" + Object.keys(soundList).length);
+
     var device = ["iPhone", "iPad", "iPod", "Android"];
     for(var i=0; i<device.length; i++){
       if (navigator.userAgent.indexOf(device[i])>0){
         $('#canvas').on('touchend', function() {
-          if(soundBuffList.length == soundList.length) {
-            if(gamePart == 0) {
-              start();
-            }
+          if(gamePart == 0) {
+            start();
           }
         });
         $('#canvas').on('touchstart', function() {
-          if(soundBuffList.length == soundList.length) {
-            touch = true;
-          }
+          touch = true;
         });
         break;
       }
       if(i == device.length-1) {
         $('#canvas').on('mousedown', function() {
-          if(soundBuffList.length == soundList.length) {
-            if(gamePart == 0) {
-              start();
-            }
-            touch = true;
+          if(gamePart == 0) {
+            start();
           }
+          touch = true;
         });
       }
     };
