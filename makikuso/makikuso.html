@@ -4,7 +4,7 @@
 <head>
   <title>真姫ちゃんクソゲーかきくけこ</title>
   <link rel="shortcut icon" href="maki_chan/favicon.ico">
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <meta charset="utf-8" content="width=device-width, user-scale=yes, initial-scale=1.0, maximum-scale=1.0">
   <script
   src="https://code.jquery.com/jquery-3.3.1.js"
@@ -12,34 +12,34 @@
   crossorigin="anonymous"></script>
   <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+    navigator.serviceWorker.register('service-worker.js').then(function(registration) {
       // console.log('ServiceWorker registration successful with scope: ', registration.scope);
     }).catch(function(err) {
       console.log('ServiceWorker registration failed: ', err);
     });
   }
   var backGraph = new Image();
-  backGraph.src = "/maki_chan/back.png";
+  backGraph.src = "maki_chan/back.png";
   var hairGraph = new Image();
-  hairGraph.src = "/maki_chan/hair.png";
+  hairGraph.src = "maki_chan/hair.png";
   var browGraph = new Array(4);
   var eyeGraph = new Array(4);
   var mouthGraph = new Array(4);
   for(var i=0; i<4; i++) {
     var index = i+1;
     browGraph[i] = new Image();
-    browGraph[i].src = "/maki_chan/brow"+ index +".png";
+    browGraph[i].src = "maki_chan/brow"+ index +".png";
     eyeGraph[i] = new Image();
-    eyeGraph[i].src = "/maki_chan/eye"+ index +".png";
+    eyeGraph[i].src = "maki_chan/eye"+ index +".png";
     mouthGraph[i] = new Image();
-    mouthGraph[i].src = "/maki_chan/mouth"+ index +".png";
+    mouthGraph[i].src = "maki_chan/mouth"+ index +".png";
   }
   var context = null;
   var soundBuffList = {};
   var soundList = {
-    vee1: "/maki_chan/VEE1.wav",
-    vee2: "/maki_chan/VEE2.wav",
-    bgm : "/maki_chan/BGM.mp3"
+    vee1: "maki_chan/VEE1.wav",
+    vee2: "maki_chan/VEE2.wav",
+    bgm : "maki_chan/BGM.mp3"
   }
   </script>
 </head>
@@ -230,7 +230,6 @@
     if(onloadFlag && Object.keys(soundBuffList).length == Object.keys(soundList).length) {
       return;
     }
-      console.log("aaa");
 
     var jumpSpan = 5;
     var jumpTime = 30;
