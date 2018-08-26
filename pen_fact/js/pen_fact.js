@@ -7,17 +7,14 @@ var camera;
 var objList = {};
 var objSourceList = ["pen"];
 
-var loadingText = new LoadingText(,);
-
 $(document).ready(function() {
   // レンダラーを作成
   // レンダラーを作成
   renderer = new THREE.WebGLRenderer({
-    canvas: document.getElementById('canvas'),
+    canvas: document.getElementById('WebGL'),
     alpha: true
   });
   renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(1280, 960);
 
   $(window).trigger('resize');
 
@@ -26,7 +23,7 @@ $(document).ready(function() {
   renderer.setClearColor(0xffffff, 0.0);
 
   // カメラを作成
-  camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+  camera = new THREE.PerspectiveCamera(45, 640 / 480, 1, 10000);
   camera.position.set(0, 0, +1000);
 
   // 平行光源
@@ -47,6 +44,7 @@ $(document).ready(function() {
   //renderer.render(scene, camera);
   tick();
 
+  LoadingTextStart();
 });
 
 $(window).on('load', function(){
@@ -78,6 +76,7 @@ $(window).on('load', function(){
 $(window).resize(function() {
   width = $('body').width();
   height = $('body').height();
+
   var scale;
 
   if(height / width < 0.75) {
@@ -85,11 +84,19 @@ $(window).resize(function() {
   } else {
     scale = width/640;
   }
+  setLoadingTextScale();
 
-  $('#canvas').css("width", 640*scale);
-  $('#canvas').css("height", 480*scale);
-  $('#canvas').css("left", width/2 - 320*scale);
-  $('#canvas').css("top", height/2 - 240*scale);
+  renderer.setSize(640*scale, 480*scale);
+
+  $('#WebGL').css("width",  640*scale);
+  $('#WebGL').css("height", 480*scale);
+  $('#WebGL').css("left", width/2 - 320*scale);
+  $('#WebGL').css("top", height/2 - 240*scale);
+
+  $('#game_back').css("width",  640*scale);
+  $('#game_back').css("height", 480*scale);
+  $('#game_back').css("left", width/2 - 320*scale);
+  $('#game_back').css("top", height/2 - 240*scale);
 });
 
 function loadObj(objList, objSourceList) {

@@ -1,48 +1,76 @@
-class LoadingText {
-  constructor(span, time, max, wait) {
-    this.loadStr = ["N","o","w"," ","L","o","a","d","i","n","g"];
-    this.loadCount = 0;
-    this.onloadFlag = false;
+var loadingTextStr = ["N","o","w"," ","L","o","a","d","i","n","g"];
+var loadingTextCount = 0;
+var loadingTextFlag = false;
 
-    this.scale = scale;
-    this.jumpSpan = span;
-    this.jumpTime = time;
-    this.jumpMax = max;
-    this.waitTime = wait;
+var loadingTextScale = 1.0;
+var textJumpSpan = 5;
+var textJumpTime = 30;
+var textJumpMax = 50;
+var textJumpWait = 50;
+
+function setLoadingTextState(span, time, max, wait) {
+  textJumpSpan = span;
+  textJumpTime = time;
+  textJumpMax = max;
+  textJumpWait = wait;
+}
+
+function setLoadingTextScale() {
+  var width = $('body').width();
+  var height = $('body').height();
+
+  if(height / width < 0.75) {
+    loadingTextScale = height/480;
+  } else {
+    loadingTextScale = width/640;
   }
 
-  set scale(scale) {
-    this.scale = scale;
+  var canvas = document.getElementById("loadingText");
+  var ctx = canvas.getContext('2d');
+  canvas.setAttribute("width", width);
+  canvas.setAttribute("height", height);
+}
+
+function LoadingTextStart() {
+  loadingTextFlag = false;
+  LoadingTextDraw();
+}
+
+function LoadingTextEnd() {
+  loadingTextFlag = true;
+}
+
+function LoadingTextDraw() {
+  if(loadingTextFlag) {
+    return;
   }
 
-  draw(domId) {
-    if(this.onloadFlag) {
-      return;
+  var width = $('body').width();
+  var height = $('body').height();
+
+  var canvas = document.getElementById("loadingText");
+  var ctx = canvas.getContext('2d');
+  ctx.font =  640*loadingTextScale/12+"px 'ＭＳ ゴシック'";
+  ctx.fillStyle="#ffffff";
+  ctx.clearRect(0, 0, width, height);
+  var loadY = new Array(loadingTextStr.length);
+
+  var cx = width/2;
+  var cy = height/2;
+  var center = textJumpTime/2;
+
+  for(var i=0; i<loadingTextStr.length; i++) {
+    if(textJumpSpan*i <= loadingTextCount && loadingTextCount < textJumpSpan*i + textJumpTime) {
+      var relCount = loadingTextCount - textJumpSpan*i - center;
+      loadY[i] = (center*center - relCount*relCount) / (center*center) * textJumpMax;
+    } else {
+      loadY[i] = 0;
     }
-
-    var canvas = document.getElementById(domId);
-    var ctx = canvas.getContext('2d');
-    ctx.font =  640*scale/12+"px 'ＭＳ ゴシック'";
-    ctx.fillStyle="#ffffff";
-    var loadY = new Array(loadStr.length);
-
-    var cx = canvas.width();
-    var cy = canvas.height();
-    var center = this.jumpTime/2;
-
-    for(var i=0; i<loadStr.length; i++) {
-      if(this.jumpSpan*i <= loadCount && loadCount < this.jumpSpan*i + this.jumpTime) {
-        var relCount = loadCount - this.jumpSpan*i - center;
-        loadY[i] = (center*center - relCount*relCount) / (center*center) * this.jumpMax;
-      } else {
-        loadY[i] = 0;
-      }
-    }
-    loadCount = (loadCount + 1) % (this.jumpSpan*(loadStr.length-1) + this.jumpTime + this.waitTime);
-    for(var i=0; i<loadStr.length; i++) {
-      ctx.fillText(loadStr[i], cx+(-155 + i*27)*this.scale, cy+(50 - loadY[i])*this.scale);
-    }
-
-    setTimeout(loading, 10);
   }
+  loadingTextCount = (loadingTextCount + 1) % (textJumpSpan*(loadingTextStr.length-1) + textJumpTime + textJumpWait);
+  for(var i=0; i<loadingTextStr.length; i++) {
+    ctx.fillText(loadingTextStr[i], cx+(-155 + i*27)*loadingTextScale, cy+(50 - loadY[i])*loadingTextScale);
+  }
+
+  setTimeout(LoadingTextDraw, 10);
 }

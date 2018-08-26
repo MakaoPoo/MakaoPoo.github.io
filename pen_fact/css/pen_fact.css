@@ -6,13 +6,14 @@ html {
 body {
   width: 100%;
   height: 100%;
+  margin: 0;
   background-color: #000;
 }
 
 canvas {
   position: absolute;
-  width: 1280px;
-  height: 960px;
+  top: 0;
+  left: 0;
 }
 
 img {
