@@ -5,7 +5,11 @@ var scene;
 var camera;
 
 var objList = {};
-var objSourceList = ["pen"];
+var objSourceList = ["pen", "cap"];
+
+var count = 0;
+var score = 0;
+var miss = 0;
 
 $(document).ready(function() {
   // レンダラーを作成
@@ -20,54 +24,92 @@ $(document).ready(function() {
 
   // シーンを作成
   scene = new THREE.Scene();
-  renderer.setClearColor(0xffffff, 0.0);
+  renderer.setClearColor(0x000000, 0.0);
 
   // カメラを作成
   camera = new THREE.PerspectiveCamera(45, 640 / 480, 1, 10000);
-  camera.position.set(0, 0, +1000);
+  // camera.position.set(0, 0, +250);
+  camera.position.set(0, 0, +250);
 
   // 平行光源
-  const directionalLight1 = new THREE.DirectionalLight(0xFFFFFF);
-  directionalLight1.position.set(0.5, 1, 1);
-  const directionalLight2 = new THREE.DirectionalLight(0xFFFFFF);
-  directionalLight2.position.set(0.5, -1, 0);
-  const directionalLight3 = new THREE.DirectionalLight(0xFFFFFF);
-  directionalLight3.position.set(-1.0, 0, 0);
+  const directionalLight1 = new THREE.PointLight(0xFFFFFF, 0.5);
+  directionalLight1.position.set(-50, 100, -50);
+  const directionalLight2 = new THREE.PointLight(0xFFFFFF, 0.5);
+  directionalLight2.position.set(50, 100, -50);
+  const directionalLight3 = new THREE.PointLight(0xFFFFFF, 0.5);
+  directionalLight3.position.set(150, 100, -50);
+
+  const directionalLight4 = new THREE.PointLight(0xFFFFFF, 0.5);
+  directionalLight4.position.set(-50, 100, -50);
+  const directionalLight5 = new THREE.PointLight(0xFFFFFF, 0.5);
+  directionalLight5.position.set(50, 100, -50);
+  const directionalLight6 = new THREE.PointLight(0xFFFFFF, 0.5);
+  directionalLight6.position.set(150, 100, -50);
+
+  const directionalLight7 = new THREE.DirectionalLight(0xFFFFFF, 0.5);
+  directionalLight7.position.set(20, -50, 100);
+
   // シーンに追加
   scene.add(directionalLight1);
   scene.add(directionalLight2);
   scene.add(directionalLight3);
+  scene.add(directionalLight4);
+  scene.add(directionalLight5);
+  scene.add(directionalLight6);
+  scene.add(directionalLight7);
 
-  loadObj(objList, objSourceList);
+  loadObj(0);
 
-  // 初回実行
-  //renderer.render(scene, camera);
-  tick();
+  main();
 
   LoadingTextStart();
 });
 
+  var touchStartX;
+  var touchStartY;
+  var touchMoveX;
+  var touchMoveY;
 $(window).on('load', function(){
 
   var device = ["iPhone", "iPad", "iPod", "Android"];
   for(var i=0; i<device.length; i++){
     if (navigator.userAgent.indexOf(device[i])>0){
-      $('.touch_area').on('touchend', function() {
-        if(gamePart == 0) {
-          start();
+      // $('.touch_area').on('touchend', function() {
+      //     start();
+      // });
+      $('#loadingText').on('touchstart', function(event) {
+        event.preventDefault();
+        // 座標の取得
+        touchStartX = event.touches[0].pageX;
+        touchStartY = event.touches[0].pageY;
+        console.log("touch " + touchStartX + ":" + touchStartY);
+      });
+
+      $('#loadingText').on('touchmove', function(event) {
+        event.preventDefault();
+        // 座標の取得
+        touchMoveX = event.changedTouches[0].pageX;
+        touchMoveY = event.changedTouches[0].pageY;
+      });
+
+      $('#loadingText').on('touchend', function(event) {
+        if (touchStartX > touchMoveX) {
+            if (touchStartX > (touchMoveX + 50)) {
+            console.log("left move");
+            }
+        } else if (touchStartX < touchMoveX) {
+            if ((touchStartX + 50) < touchMoveX) {
+            console.log("right move");
+            }
         }
       });
-      $('.touch_area').on('touchstart', function() {
-        touch = true;
-      });
+
       break;
     }
     if(i == device.length-1) {
       $('.touch_area').on('mousedown', function() {
-        if(gamePart == 0) {
-          start();
-        }
-        touch = true;
+        //   start();
+        // touch = true;
       });
     }
   };
@@ -99,36 +141,42 @@ $(window).resize(function() {
   $('#game_back').css("top", height/2 - 240*scale);
 });
 
-function loadObj(objList, objSourceList) {
+function loadObj(index) {
+  if(index >= objSourceList.length) return;
   var objLoader = new THREE.OBJLoader();
   var mtlLoader = new THREE.MTLLoader();
 
-  for(var i in objSourceList) {
-    var modelPath = "resource/";
-    var objName = objSourceList[i] + ".obj";
-    var mtlName = objSourceList[i] + ".mtl";
-    mtlLoader.setPath(modelPath);
-    mtlLoader.load(mtlName, function (materials){
-      materials.preload();
+  var modelPath = "resource/";
+  var objName = objSourceList[index] + ".obj";
+  var mtlName = objSourceList[index] + ".mtl";
+  mtlLoader.setPath(modelPath);
+  mtlLoader.load(mtlName, function (materials){
+    materials.preload();
 
-      objLoader.setMaterials(materials);
-      objLoader.setPath(modelPath);
-      objLoader.load(objName, function (object){
-        object.scale.set(4, 4, 4);
-        objList[objSourceList[i]] = object;
-        scene.add( objList[objSourceList[i]] );
-      });
+    objLoader.setMaterials(materials);
+    objLoader.setPath(modelPath);
+    objLoader.load(objName, function (object){
+
+      objList[objSourceList[index]] = object;
+      scene.add( objList[objSourceList[index]] );
+      loadObj(index+1);
     });
-  }
+  });
 }
 
-function tick() {
-  requestAnimationFrame(tick);
+function main() {
+  requestAnimationFrame(main);
 
   // 箱を回転させる
   if(objList["pen"] != null) {
-    objList["pen"].rotation.x += 0.1;
+    objList["pen"].rotation.x += 0.01;
   }
+  if(objList["cap"] != null) {
+    objList["cap"].rotation.y += 0.1;
+  }
+  // if(objList["cap"] != null) {
+  //   objList["cap"].rotation.z = 0.5;
+  // }
   // objList["pen"].rotation.z += 0.01;
 
   // レンダリング
