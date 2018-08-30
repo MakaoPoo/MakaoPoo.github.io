@@ -19,3 +19,13 @@ canvas {
 img {
   position: absolute;
 }
+
+p {
+  position: absolute;
+  text-align: right;
+  color: #fff;
+  font-family: 'HGｺﾞｼｯｸE';
+  margin: 0;
+  text-shadow: #000 2px 2px 1px, #000 -2px 2px 1px,
+  #000 2px -2px 1px, #000 -2px -2px 1px;
+}

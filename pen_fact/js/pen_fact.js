@@ -30,6 +30,12 @@ var oneTap = false;
 var touchstartTime;
 
 $(document).ready(function() {
+  if(!isNaN($.cookie('score'))) {
+    score = $.cookie('score');
+  }
+  if(!isNaN($.cookie('miss'))) {
+    miss = $.cookie('miss');
+  }
   // レンダラーを作成
   renderer = new THREE.WebGLRenderer({
     canvas: document.getElementById('WebGL'),
@@ -85,6 +91,8 @@ function addLight() {
 }
 
 $(window).on('load', function(){
+  updateScore();
+
   var device = ["iPhone", "iPad", "iPod", "Android"];
   for(var i=0; i<device.length; i++){
     if (navigator.userAgent.indexOf(device[i])>0){
@@ -112,16 +120,12 @@ $(window).on('load', function(){
 
           if (touchMoveY > 50 && Math.abs(touchMoveY/touchMoveX) > 2) {
             upSwipe = true;
-            console.log("up");
           }else if (touchMoveY < -50 && Math.abs(touchMoveY/touchMoveX) > 2) {
             downSwipe = true;
-            console.log("down");
           }else if (touchMoveX < -50 && Math.abs(touchMoveX/touchMoveY) > 2) {
             leftSwipe = true;
-            console.log("left");
           }else if(Math.abs(touchMoveX)<10 && Math.abs(touchMoveY)<10) {
             oneTap = true;
-            console.log("tap");
           }
         }
       });
@@ -131,16 +135,12 @@ $(window).on('load', function(){
       $('html').keydown(function(e){
         if(e.keyCode == 38){
           upSwipe = true;
-          console.log("tate");
         }else if(e.keyCode == 40){
           downSwipe = true;
-          console.log("down");
         }else if(e.keyCode == 37){
           leftSwipe = true;
-          console.log("left");
         }else if(e.keyCode == 32){
           oneTap = true;
-          console.log("tap");
         }
       });
     }
@@ -171,6 +171,12 @@ $(window).resize(function() {
   $('#game_back').css("height", 480*scale);
   $('#game_back').css("left", width/2 - 320*scale);
   $('#game_back').css("top", height/2 - 240*scale);
+
+  $('p').css("font-size", 30*scale +"px");
+  $('p').css("width", 627*scale);
+  $('p').css("top", height/2 - 230*scale);
+  $('p').css("left", $('#WebGL').css("left"));
+  $('p').css("letter-spacing", 3*scale +"px");
 });
 
 function loadObj(index) {
@@ -253,6 +259,14 @@ function Action() {
     if(oneTap) {
       isCapSet[capObj.length-1] = !isCapSet[capObj.length-1];
     }else if(leftSwipe) {
+      if(penDir[penObj.length/2] && isCapSet[capObj.length-1]) {
+        score++;
+        $.cookie('score', score);
+        updateScore();
+      }else {
+        miss++;
+        $.cookie('miss', miss);
+      }
       slidePen();
       movingCount = speed;
     }else if(upSwipe && !isCapSet[capObj.length-1]) {
@@ -268,6 +282,15 @@ function Action() {
   upSwipe = false;
   downSwipe = false;
   leftSwipe = false;
+}
+
+function updateScore() {
+  var scoreStr = String(score);
+  var socreLength = scoreStr.length;
+  for(var i=0; i<34-socreLength; i++) {
+    scoreStr = '0' + scoreStr;
+  }
+  $('p').text(scoreStr);
 }
 
 function FixModel() {
