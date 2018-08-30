@@ -230,14 +230,15 @@ function main() {
 }
 
 function Action() {
+  var speed = 8;
   if(movingCount > 0) {
-    movingCount += 4;
+    movingCount += speed;
   }
   if(rotateCount > 0) {
-    rotateCount += 10;
+    rotateCount += speed*2;
   }
   if(rotateCount < 0) {
-    rotateCount -= 10;
+    rotateCount -= speed*2;
   }
   if(movingCount > penSpan) {
     movingCount = penSpan;
@@ -253,13 +254,13 @@ function Action() {
       isCapSet[capObj.length-1] = !isCapSet[capObj.length-1];
     }else if(leftSwipe) {
       slidePen();
-      movingCount = 4;
+      movingCount = speed;
     }else if(upSwipe && !isCapSet[capObj.length-1]) {
       penDir[capObj.length-1] = !penDir[capObj.length-1];
-      rotateCount = 10;
+      rotateCount = speed*2;
     }else if(downSwipe && !isCapSet[capObj.length-1]) {
       penDir[capObj.length-1] = !penDir[capObj.length-1];
-      rotateCount = -10;
+      rotateCount = -speed*2;
     }
   }
 
@@ -319,6 +320,7 @@ function slidePen() {
     penObj[i].visible = penObj[i+1].visible;
 		penDir[i] = penDir[i+1];
 	}
+  penDir[penObj.length-1] = (getRand(1, 0) == 0);
 
 	for(var i=0; i<capObj.length-1; i++) {
   	isCapSet[i] = isCapSet[i+1];
