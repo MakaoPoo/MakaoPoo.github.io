@@ -1,18 +1,35 @@
+let PI = 3.141592;
 var width, height;
 
 var renderer;
 var scene;
 var camera;
 
-var objList = {};
+var penObj = new Array(4);
+var capObj = new Array(3);
 var objSourceList = ["pen", "cap"];
 
-var count = 0;
+var penDir = new Array(penObj.length);
+var isCapSet =  new Array(capObj.length);
+let penSpan = 100;
+var movingCount = penSpan;
+var rotateCount = 180;
 var score = 0;
 var miss = 0;
 
+var touchStartX;
+var touchStartY;
+var touchEndX;
+var touchEndY;
+
+var leftSwipe = false;
+var upSwipe = false;
+var downSwipe = false;
+var oneTap = false;
+
+var touchstartTime;
+
 $(document).ready(function() {
-  // レンダラーを作成
   // レンダラーを作成
   renderer = new THREE.WebGLRenderer({
     canvas: document.getElementById('WebGL'),
@@ -29,8 +46,16 @@ $(document).ready(function() {
   // カメラを作成
   camera = new THREE.PerspectiveCamera(45, 640 / 480, 1, 10000);
   // camera.position.set(0, 0, +250);
-  camera.position.set(0, 0, +250);
+  camera.position.set(0, 32, +300);
 
+  addLight();
+
+  loadObj(0);
+
+  LoadingTextStart();
+});
+
+function addLight() {
   // 平行光源
   const directionalLight1 = new THREE.PointLight(0xFFFFFF, 0.5);
   directionalLight1.position.set(-50, 100, -50);
@@ -57,59 +82,66 @@ $(document).ready(function() {
   scene.add(directionalLight5);
   scene.add(directionalLight6);
   scene.add(directionalLight7);
+}
 
-  loadObj(0);
-
-  main();
-
-  LoadingTextStart();
-});
-
-  var touchStartX;
-  var touchStartY;
-  var touchMoveX;
-  var touchMoveY;
 $(window).on('load', function(){
-
   var device = ["iPhone", "iPad", "iPod", "Android"];
   for(var i=0; i<device.length; i++){
     if (navigator.userAgent.indexOf(device[i])>0){
-      // $('.touch_area').on('touchend', function() {
-      //     start();
-      // });
       $('#loadingText').on('touchstart', function(event) {
         event.preventDefault();
+        touchstartTime = new Date().getTime();
         // 座標の取得
         touchStartX = event.touches[0].pageX;
         touchStartY = event.touches[0].pageY;
-        console.log("touch " + touchStartX + ":" + touchStartY);
+        touchEndX = touchStartX;
+        touchEndY = touchStartY;
       });
-
       $('#loadingText').on('touchmove', function(event) {
         event.preventDefault();
         // 座標の取得
-        touchMoveX = event.changedTouches[0].pageX;
-        touchMoveY = event.changedTouches[0].pageY;
+        touchEndX = event.touches[0].pageX;
+        touchEndY = event.touches[0].pageY;
       });
 
       $('#loadingText').on('touchend', function(event) {
-        if (touchStartX > touchMoveX) {
-            if (touchStartX > (touchMoveX + 50)) {
-            console.log("left move");
-            }
-        } else if (touchStartX < touchMoveX) {
-            if ((touchStartX + 50) < touchMoveX) {
-            console.log("right move");
-            }
+        var touchendTime = new Date().getTime();
+        if(touchendTime - touchstartTime < 300) {
+          var touchMoveX = touchEndX - touchStartX;
+          var touchMoveY = touchEndY - touchStartY;
+
+          if (touchMoveY > 50 && Math.abs(touchMoveY/touchMoveX) > 2) {
+            upSwipe = true;
+            console.log("up");
+          }else if (touchMoveY < -50 && Math.abs(touchMoveY/touchMoveX) > 2) {
+            downSwipe = true;
+            console.log("down");
+          }else if (touchMoveX < -50 && Math.abs(touchMoveX/touchMoveY) > 2) {
+            leftSwipe = true;
+            console.log("left");
+          }else if(Math.abs(touchMoveX)<10 && Math.abs(touchMoveY)<10) {
+            oneTap = true;
+            console.log("tap");
+          }
         }
       });
-
       break;
     }
     if(i == device.length-1) {
-      $('.touch_area').on('mousedown', function() {
-        //   start();
-        // touch = true;
+      $('html').keydown(function(e){
+        if(e.keyCode == 38){
+          upSwipe = true;
+          console.log("tate");
+        }else if(e.keyCode == 40){
+          downSwipe = true;
+          console.log("down");
+        }else if(e.keyCode == 37){
+          leftSwipe = true;
+          console.log("left");
+        }else if(e.keyCode == 32){
+          oneTap = true;
+          console.log("tap");
+        }
       });
     }
   };
@@ -123,7 +155,7 @@ $(window).resize(function() {
 
   if(height / width < 0.75) {
     scale = height/480;
-  } else {
+  }else {
     scale = width/640;
   }
   setLoadingTextScale();
@@ -142,7 +174,12 @@ $(window).resize(function() {
 });
 
 function loadObj(index) {
-  if(index >= objSourceList.length) return;
+  if(index >= objSourceList.length) {
+    LoadingTextEnd();
+    main();
+    return;
+  }
+
   var objLoader = new THREE.OBJLoader();
   var mtlLoader = new THREE.MTLLoader();
 
@@ -156,9 +193,28 @@ function loadObj(index) {
     objLoader.setMaterials(materials);
     objLoader.setPath(modelPath);
     objLoader.load(objName, function (object){
+      if(index == 0) {
+        for(var i=0; i<penObj.length; i++) {
+          var clone = object.clone();
+          penObj[i] = clone;
+          scene.add( clone );
+          penDir[i] = (getRand(1, 0) == 0);
+          if(i < 2) {
+            penObj[i].visible = false;
+          }
+        }
+      }else if(index == 1) {
+        for(var i=0; i<capObj.length; i++) {
+          var clone = object.clone();
+          capObj[i] = clone;
+          scene.add( clone );
+          isCapSet[i] = false;
+          if(i < 2) {
+            capObj[i].visible = false;
+          }
+        }
+      }
 
-      objList[objSourceList[index]] = object;
-      scene.add( objList[objSourceList[index]] );
       loadObj(index+1);
     });
   });
@@ -167,18 +223,115 @@ function loadObj(index) {
 function main() {
   requestAnimationFrame(main);
 
-  // 箱を回転させる
-  if(objList["pen"] != null) {
-    objList["pen"].rotation.x += 0.01;
-  }
-  if(objList["cap"] != null) {
-    objList["cap"].rotation.y += 0.1;
-  }
-  // if(objList["cap"] != null) {
-  //   objList["cap"].rotation.z = 0.5;
-  // }
-  // objList["pen"].rotation.z += 0.01;
-
+  Action() ;
+  FixModel();
   // レンダリング
   renderer.render(scene, camera);
+}
+
+function Action() {
+  if(movingCount > 0) {
+    movingCount += 4;
+  }
+  if(rotateCount > 0) {
+    rotateCount += 10;
+  }
+  if(rotateCount < 0) {
+    rotateCount -= 10;
+  }
+  if(movingCount > penSpan) {
+    movingCount = penSpan;
+  }
+  if(rotateCount > 180) {
+    rotateCount = 180;
+  }
+  if(rotateCount < -180) {
+    rotateCount = -180;
+  }
+  if(movingCount == penSpan && Math.abs(rotateCount) == 180) {
+    if(oneTap) {
+      isCapSet[capObj.length-1] = !isCapSet[capObj.length-1];
+    }else if(leftSwipe) {
+      slidePen();
+      movingCount = 4;
+    }else if(upSwipe && !isCapSet[capObj.length-1]) {
+      penDir[capObj.length-1] = !penDir[capObj.length-1];
+      rotateCount = 10;
+    }else if(downSwipe && !isCapSet[capObj.length-1]) {
+      penDir[capObj.length-1] = !penDir[capObj.length-1];
+      rotateCount = -10;
+    }
+  }
+
+  oneTap = false;
+  upSwipe = false;
+  downSwipe = false;
+  leftSwipe = false;
+}
+
+function FixModel() {
+  for(var i=0; i<penObj.length; i++) {
+    if(penObj[i] == null) continue;
+    var posX = -penSpan + i*penSpan - movingCount;
+    var direct = penDir[i] *180 *PI/180;
+    if(i == penObj.length/2) {
+      direct += (180-rotateCount)*PI/180;
+    }
+
+    if(posX <= 0) {
+      penObj[i].rotation.x = direct;
+    }else if(posX >= penSpan-1) {
+      var rotation = 90 * PI / 180;
+      penObj[i].rotation.x = rotation + direct;
+    }else {
+      var rotation = (90 * PI / 180) * ((penSpan-movingCount)/ penSpan);
+      penObj[i].rotation.x = rotation + direct;
+    }
+    penObj[i].position.x = -penSpan + i*penSpan - movingCount;
+  }
+
+  var lastCap = capObj.length-1;
+  for(var i=0; i<capObj.length; i++) {
+    if(capObj[i] == null) continue;
+
+    if(i < capObj.length) {
+      if(isCapSet[i]) {
+        capObj[i].position.y = 0;
+      }else {
+        capObj[i].position.y = 45;
+      }
+    }
+
+    if(i < lastCap) {
+      capObj[i].position.x = -penSpan + i*penSpan - movingCount;
+    }
+  }
+  if(isCapSet[lastCap]) {
+    capObj[lastCap].rotation.z = 0.0;
+  }else {
+    capObj[lastCap].rotation.y += 0.07;
+    capObj[lastCap].rotation.z = 0.02;
+  }
+}
+
+function slidePen() {
+	for(var i=0; i<penObj.length-1; i++) {
+    penObj[i].visible = penObj[i+1].visible;
+		penDir[i] = penDir[i+1];
+	}
+
+	for(var i=0; i<capObj.length-1; i++) {
+  	isCapSet[i] = isCapSet[i+1];
+    capObj[i].visible = isCapSet[i];
+    capObj[i].rotation.y = capObj[i+1].rotation.y
+	}
+  if(isCapSet[capObj.length - 1]) {
+    capObj[capObj.length - 1].rotation.y = 1.0;
+  }
+  isCapSet[capObj.length - 1] = false;
+}
+
+function getRand(max, min){
+  var rand = Math.floor( Math.random() * (max + 1 - min) ) + min ;
+  return rand;
 }
