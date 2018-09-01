@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css?family=Great+Vibes');
+
+html, body ,header{
+  width: 100%;
+  max-width: 150vmin;
+  margin: 0 auto;
+  padding: 0;
+}
+
+body {
+}
+
+.title_bar {
+  font-family: 'Great Vibes', cursive;
+  width: 100%;
+  color: #ffffff;
+  background-color: #282b65;
+  font-size: calc(50px + 2.5vh);
+  font-style: italic;
+  margin: 0;
+  padding: 2vmin 0;
+}
+
+div.denko {
+  position: relative;
+  width: 100%;
+  background-color: #000000;
+  margin: 0;
+  padding: 2vmin 0;
+  overflow: hidden;
+}
+
+div.denko-cover {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image:
+    linear-gradient(
+      transparent 60%,
+      rgba(0, 0, 0, 1) 40%
+    ),
+    linear-gradient(
+      90deg,
+        transparent 40%,
+        rgba(0, 0, 0, 1) 60%
+    );
+  background-size: 5px 5px;
+  background-repeat: repeat;
+}
+
+.denko > p{
+  color: #ffc700;
+  font-size: calc(20px + 2.5vh);
+  margin: 0;
+  padding-left: 110%; /*アニメーションの範囲*/
+  display:inline-block;
+  white-space:nowrap;
+  animation-name:marquee; /*アニメーションのクラス名*/
+  animation-timing-function:linear;/*アニメーションのタイミング・進行割合の指定*/
+  animation-duration:20s; /*アニメーションの速度*/
+  animation-iteration-count:infinite;/*アニメーションの動作回数*/
+  }
+  @keyframes marquee {/*動作範囲(上級者向けの設定)*/
+  from   { transform: translate(0%);}
+  99%,to { transform: translate(-100%);}
+}
+
+div.content-main {
+  text-align: center;
+}
+
+a {
+  margin: 10px auto;
+  font-size: calc(12px + 2.5vh);
+  display: block;
+}
