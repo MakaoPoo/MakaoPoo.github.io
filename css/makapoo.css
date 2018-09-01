@@ -15,10 +15,10 @@ body {
   width: 100%;
   color: #ffffff;
   background-color: #282b65;
-  font-size: calc(50px + 2.5vh);
+  font-size: calc(20px + 6vh);
   font-style: italic;
   margin: 0;
-  padding: 2vmin 0;
+  padding: 3vh 0;
 }
 
 div.denko {
@@ -46,13 +46,13 @@ div.denko-cover {
         transparent 40%,
         rgba(0, 0, 0, 1) 60%
     );
-  background-size: 5px 5px;
+  background-size: 7px 7px;
   background-repeat: repeat;
 }
 
 .denko > p{
   color: #ffc700;
-  font-size: calc(20px + 2.5vh);
+  font-size: calc(20px + 6vh);
   margin: 0;
   padding-left: 110%; /*アニメーションの範囲*/
   display:inline-block;
