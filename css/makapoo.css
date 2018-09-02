@@ -37,15 +37,8 @@ div.denko-cover {
   top: 0;
   left: 0;
   background-image:
-    linear-gradient(
-      transparent 60%,
-      rgba(0, 0, 0, 1) 40%
-    ),
-    linear-gradient(
-      90deg,
-        transparent 40%,
-        rgba(0, 0, 0, 1) 60%
-    );
+  linear-gradient( transparent 60%, #000000 40% ),
+  linear-gradient( 90deg, transparent 40%, #000000 60% );
   background-size: 7px 7px;
   background-repeat: repeat;
 }
@@ -61,8 +54,8 @@ div.denko-cover {
   animation-timing-function:linear;/*アニメーションのタイミング・進行割合の指定*/
   animation-duration:20s; /*アニメーションの速度*/
   animation-iteration-count:infinite;/*アニメーションの動作回数*/
-  }
-  @keyframes marquee {/*動作範囲(上級者向けの設定)*/
+}
+@keyframes marquee {/*動作範囲(上級者向けの設定)*/
   from   { transform: translate(0%);}
   99%,to { transform: translate(-100%);}
 }
