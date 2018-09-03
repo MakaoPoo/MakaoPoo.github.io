@@ -15,16 +15,16 @@ body {
   width: 100%;
   color: #ffffff;
   background-color: #282b65;
-  font-size: calc(20px + 6vh);
+  font-size: calc(10px + 3vh);
   font-style: italic;
   margin: 0;
-  padding: 3vh 0;
+  padding: 1vh 0;
 }
 
 div.denko {
   position: relative;
   width: 100%;
-  background-color: #000000;
+  background-color: #1c1c1c;
   margin: 0;
   padding: 2vmin 0;
   overflow: hidden;
@@ -45,14 +45,14 @@ div.denko-cover {
 
 .denko > p{
   color: #ffc700;
-  font-size: calc(20px + 6vh);
+  font-size: calc(30px + 6vh);
   margin: 0;
   padding-left: 110%; /*アニメーションの範囲*/
   display:inline-block;
   white-space:nowrap;
   animation-name:marquee; /*アニメーションのクラス名*/
   animation-timing-function:linear;/*アニメーションのタイミング・進行割合の指定*/
-  animation-duration:20s; /*アニメーションの速度*/
+  animation-duration:15s; /*アニメーションの速度*/
   animation-iteration-count:infinite;/*アニメーションの動作回数*/
 }
 @keyframes marquee {/*動作範囲(上級者向けの設定)*/
@@ -61,11 +61,15 @@ div.denko-cover {
 }
 
 div.content-main {
+  width: 90%;
+  margin: 20px auto;
+}
+
+.content-wrapper {
   text-align: center;
+  margin-bottom: 20px;
 }
 
 a {
-  margin: 10px auto;
-  font-size: calc(12px + 2.5vh);
-  display: block;
+  font-size: calc(12px + 2vh);
 }
